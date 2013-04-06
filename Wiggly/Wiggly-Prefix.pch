@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'Wiggly' target in the 'Wiggly' project
+//
+
+#ifdef __OBJC__
+  #import <Foundation/Foundation.h>
+#endif

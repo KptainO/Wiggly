@@ -67,8 +67,6 @@
 #pragma mark Protected Methods
 
 - (NSString *)_buildPattern {
-  // defaults.count is just used as an estimation of tokens array possible size
-//  NSMutableArray *tokens = [NSMutableArray arrayWithCapacity:self.route.defaults.count];
   NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
   NSUInteger prevStrIdx = 0;
   int firstOptionalPlaceholder = kRoutePatternOptionalPlaceholderNone;
@@ -90,24 +88,20 @@
 
     WIRoutePlaceholder *placeholder = [self _addRoutePlaceholder:variableName];
 
-//    [tokens addObject:beforePlaceholderStr];
-//    [tokens addObject:placeholder];
-
     [pattern appendString:beforePlaceholderStr];
-    [pattern appendString:placeholder.pattern];
 
-    if (!placeholder.required && (firstOptionalPlaceholder == kRoutePatternOptionalPlaceholderNone || !beforePlaceholderStr.length || [beforePlaceholderStr isEqualToString:@"/"]))
-    {
-      if (firstOptionalPlaceholder == kRoutePatternOptionalPlaceholderNone)
-        firstOptionalPlaceholder = placeholderRange.location;
-    }
-    else
+    // Try to determine if first optional placeholder
+    if (beforePlaceholderStr.length && ![beforePlaceholderStr isEqualToString:@"/"])
       firstOptionalPlaceholder = kRoutePatternOptionalPlaceholderNone;
+    if (!placeholder.required && firstOptionalPlaceholder == kRoutePatternOptionalPlaceholderNone)
+      firstOptionalPlaceholder = pattern.length;
+
+    [pattern appendString:placeholder.pattern];
 
     prevStrIdx = matchRange.location + matchRange.length;
   }
 
-  // append any missing part from path (after the last found placeholder)
+  // Append any missing part from path (after the last found placeholder)
   // which also means that there is no placeholder which can be optional
   if (prevStrIdx <= (self.route.path.length - 1))
   {
@@ -116,29 +110,17 @@
     firstOptionalPlaceholder = kRoutePatternOptionalPlaceholderNone;
   }
 
+  // Set optional placeholder as optional inside regex by surrounding with ()?
   if (firstOptionalPlaceholder != kRoutePatternOptionalPlaceholderNone)
   {
+    if ([pattern characterAtIndex:firstOptionalPlaceholder - 1] == '/')
+      firstOptionalPlaceholder -= 1;
+
     [pattern insertString:@"(" atIndex:firstOptionalPlaceholder];
     [pattern appendString:@")?"];
   }
 
-  // Optionalize non required tokens sequence at the end of the pattern
-//  if (![tokens lastObject].required)
-//  {
-//    int i = tokens.count - 1;
-//
-//    while (i >= 0) {
-//      if ([tokens[i] isKindOfClass:[WIRoutePlaceholder class]])
-//        --i;
-//      else
-//        break;
-//    }
-//
-//  [tokens insertObject:@"(" atIndex:i+1];
-//  [tokens addObject:@")?"];
-//  }
-
-  return pattern;
+  return [NSString stringWithString:pattern];
 }
 
 - (WIRoutePlaceholder *)_addRoutePlaceholder:(NSString *)name {
