@@ -11,13 +11,13 @@
 #import "WIRoute.h"
 #import "WIRoutePlaceholder.h"
 
-#define kPathSubset     @"0-9a-z-._%"
-#define kSubDelimiters  @";,*+$!)("
-#define kPlaceholderPattern [kPathSubset stringByAppendingString:kSubDelimiters]
-#define kPlaceholderRegex   @":(\\w+)"
-#define kPathDelimiters     @"/"
+NSString  *const kWIPlaceholderNameRegex = @":(\\w+)";
+NSString  *const kWIPathSubset = @"0-9a-z-._%";
+NSString  *const kWISubDelimiters = @";,*+$!)(";
 
-#define kRoutePatternOptionalPlaceholderNone -1
+#define kWIOptPlaceholderNone -1
+#define kWIPlaceholderRegex   [kWIPathSubset stringByAppendingString:kWISubDelimiters]
+#define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
 
 @interface WIRoutePattern () {
   NSMutableDictionary  *_placeholders;
@@ -69,9 +69,9 @@
 - (NSString *)_buildPattern {
   NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
   NSUInteger prevStrIdx = 0;
-  int firstOptionalPlaceholder = kRoutePatternOptionalPlaceholderNone;
+  int firstOptionalPlaceholder = kWIOptPlaceholderNone;
   NSRegularExpression *regex = [NSRegularExpression
-                                regularExpressionWithPattern:kPlaceholderRegex
+                                regularExpressionWithPattern:kWIPlaceholderNameRegex
                                 options:NSRegularExpressionCaseInsensitive
                                 error:nil];
   NSArray *placeholders = [regex matchesInString:self.route.path
@@ -83,17 +83,20 @@
     NSRange matchRange = [placeholderMatch range];
     NSRange placeholderRange = [placeholderMatch rangeAtIndex:1];
     NSString *variableName = [self.route.path substringWithRange:placeholderRange];
-    NSString *beforePlaceholderStr = [self.route.path substringWithRange:
+    NSString *prevStr = [self.route.path substringWithRange:
                                       NSMakeRange(prevStrIdx, matchRange.location - prevStrIdx)];
 
     WIRoutePlaceholder *placeholder = [self _addRoutePlaceholder:variableName];
 
-    [pattern appendString:beforePlaceholderStr];
+    [pattern appendString:prevStr];
 
+    // If there is a static text before the placeholder whose not a separator, then
+    // we reset firstOptionalPlaceholder value
+    if (prevStr.length > 1 ||
+        [prevStr rangeOfCharacterFromSet:kWISeparatorSet].location == NSNotFound)
+      firstOptionalPlaceholder = kWIOptPlaceholderNone;
     // Try to determine if first optional placeholder
-    if (beforePlaceholderStr.length && ![beforePlaceholderStr isEqualToString:@"/"])
-      firstOptionalPlaceholder = kRoutePatternOptionalPlaceholderNone;
-    if (!placeholder.required && firstOptionalPlaceholder == kRoutePatternOptionalPlaceholderNone)
+    if (!placeholder.required && firstOptionalPlaceholder == kWIOptPlaceholderNone)
       firstOptionalPlaceholder = pattern.length;
 
     [pattern appendString:placeholder.pattern];
@@ -107,11 +110,11 @@
   {
     [pattern appendString:[self.route.path substringFromIndex:prevStrIdx]];
 
-    firstOptionalPlaceholder = kRoutePatternOptionalPlaceholderNone;
+    firstOptionalPlaceholder = kWIOptPlaceholderNone;
   }
 
   // Set optional placeholder as optional inside regex by surrounding with ()?
-  if (firstOptionalPlaceholder != kRoutePatternOptionalPlaceholderNone)
+  if (firstOptionalPlaceholder != kWIOptPlaceholderNone)
   {
     if ([pattern characterAtIndex:firstOptionalPlaceholder - 1] == '/')
       firstOptionalPlaceholder -= 1;
@@ -129,7 +132,7 @@
   if (self.route.requirements[name])
     placeholder.pattern = self.route.requirements[name];
   else
-    placeholder.pattern = [NSString stringWithFormat:@"[%@]+", kPlaceholderPattern];
+    placeholder.pattern = [NSString stringWithFormat:@"[%@]+", kWIPlaceholderRegex];
 
   placeholder.required = !self.route.defaults[name];
 
