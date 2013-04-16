@@ -10,7 +10,10 @@
 
 @interface WIRoutePlaceholder : NSObject
 
-@property(nonatomic, strong)NSString  *pattern;
-@property(nonatomic)BOOL              required;
+@property(nonatomic, copy, readonly)NSString  *name;
+@property(nonatomic, strong)NSString            *pattern;
+@property(nonatomic)BOOL                        required;
+
+- (id)initWithName:(NSString *)name;
 
 @end

@@ -11,7 +11,7 @@
 @class WIRoute;
 
 @interface WIRouteBuilder : NSObject
-@property(nonatomic, strong, readonly)NSDictionary  *placeholders;
+@property(nonatomic, strong, readonly)NSArray       *placeholders;
 @property(nonatomic, strong, readonly)NSString      *pattern;
 @property(nonatomic, strong, readonly)NSString      *path;
 @property(nonatomic, strong, readonly)NSString      *shortPath;

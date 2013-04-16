@@ -9,6 +9,7 @@
 
 #import "WIRoute.h"
 #import "WIRouteBuilder.h"
+#import "WIRoutePlaceholder.h"
 
 @interface WIRouteBuilderTests : SenTestCase
 @end
@@ -16,81 +17,98 @@
 @implementation WIRouteBuilderTests
 
 - (void)testWithPlaceholder {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page"
                                    requirements:@{@"page": @"\\d+"}
                                        defaults:nil];
 
-  STAssertEqualObjects(pattern.pattern, @"/blog/\\d+", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog/\\d+", nil);
 }
 
 - (void)testWithTwoPlaceholders {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/:id"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page/:id"
                                    requirements:@{@"page": @"\\w+", @"id": @"[0-9]"}
                                        defaults:nil];
 
-  STAssertEqualObjects(pattern.pattern, @"/blog/\\w+/[0-9]", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog/\\w+/[0-9]", nil);
 }
 
 - (void)testWithTrailingBackslash {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page/"
                                    requirements:@{@"page": @"[0-9]{1,2}"}
                                        defaults:nil];
 
-  STAssertEqualObjects(pattern.pattern, @"/blog/[0-9]{1,2}/", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog/[0-9]{1,2}/", nil);
 }
 
 - (void)testWithStaticTextAtTheEnd {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/show"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page/show"
                                    requirements:@{@"page" : @"\\d+"}
                                        defaults:nil];
 
-  STAssertEqualObjects(pattern.pattern, @"/blog/\\d+/show", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog/\\d+/show", nil);
 }
 
 - (void)testWithOptionalPlaceholderAtTheEnd {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page"
                                    requirements:@{@"page": @"\\d+"}
                                        defaults:@{@"page": @"1"}];
 
-  STAssertEqualObjects(pattern.pattern, @"/blog(/\\d+)?", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog(/\\d+)?", nil);
 }
 
 - (void)testWithRequiredAndOptionalPlaceholderAtTheEnd {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/show/:id/and/:foo"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page/show/:id/and/:foo"
                                    requirements:@{@"page" : @"\\d+", @"id": @"\\d+", @"foo": @"\\d+"} defaults:@{@"foo": @1, @"id": @2}];
-  STAssertEqualObjects(pattern.pattern, @"/blog/\\d+/show/\\d+/and(/\\d+)?", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog/\\d+/show/\\d+/and(/\\d+)?", nil);
 }
 
 - (void)testWithOptionalPlaceholdersNotAtTheEnd {
-  WIRouteBuilder  *pattern = [self _routePattern:@"/blog/:page/show/:id/last"
+  WIRouteBuilder  *builder = [self _routePattern:@"/blog/:page/show/:id/last"
                                     requirements:@{@"page": @"\\d+", @"id": @"\\d+"}
                                         defaults:@{@"id": @2}];
 
-  STAssertEqualObjects(pattern.pattern, @"/blog/\\d+/show/\\d+/last", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog/\\d+/show/\\d+/last", nil);
 }
 
 - (void)testWithStaticTextBetweenTwoOptionalPlaceholders {
-  WIRouteBuilder  *pattern = [self _routePattern:@"/blog/:page/show/:id"
+  WIRouteBuilder  *builder = [self _routePattern:@"/blog/:page/show/:id"
                                     requirements:@{@"page": @"\\d+", @"id": @"\\d+"}
                                         defaults:@{@"id": @2}];
 
-  STAssertEqualObjects(pattern.pattern, @"/blog/\\d+/show(/\\d+)?", nil);
+  STAssertEqualObjects(builder.pattern, @"/blog/\\d+/show(/\\d+)?", nil);
 }
 
 - (void)testShortPathEqualLongPath {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page"
                                    requirements:nil
                                        defaults:nil];
 
-  STAssertEqualObjects(pattern.shortPath, pattern.path, nil);
+  STAssertEqualObjects(builder.shortPath, builder.path, nil);
 }
 
 - (void)testShortPathShorterThanLongPath {
-  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
+  WIRouteBuilder *builder = [self _routePattern:@"/blog/:page"
                                    requirements:nil
                                        defaults:@{@"page": @1}];
 
-  STAssertEqualObjects(pattern.shortPath, @"/blog", nil);
+  STAssertEqualObjects(builder.shortPath, @"/blog", nil);
+}
+
+- (void)testPlaceholdersSetAsRequired {
+  WIRouteBuilder  *builder = [self _routePattern:@"/blog/:page/show/:id"
+                                    requirements:nil
+                                        defaults:@{@"page": @1, @"id": @1}];
+
+  STAssertTrue(((WIRoutePlaceholder *)builder.placeholders[0]).required, nil);
+}
+
+- (void)testPlaceholdersAllSetAsRequired {
+  WIRouteBuilder  *builder = [self _routePattern:@"/blog/:page/show/:id/foo"
+                                    requirements:nil
+                                        defaults:@{@"page": @1, @"id": @1}];
+
+  for (WIRoutePlaceholder *holder in builder.placeholders)
+    STAssertTrue(holder.required, @"'%@' holder is not set to required", holder.name);
 }
 
 - (WIRouteBuilder *)_routePattern:(NSString *)path

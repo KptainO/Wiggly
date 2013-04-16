@@ -8,18 +8,28 @@
 
 #import "WIRoutePlaceholder.h"
 
+@interface WIRoutePlaceholder ()
+@property(nonatomic, copy)NSString  *name;
+@end
+
 @implementation WIRoutePlaceholder
 
 #pragma mark -
 #pragma mark Initialization
 
-- (id)init {
+- (id)initWithName:(NSString *)name {
   if (!(self = [super init]))
     return nil;
 
-  //@FIXME
+  self.name = name;
+  self.required = YES;
 
   return self;
+}
+
+- (id)init {
+  @throw [NSException exceptionWithName:@"Invalid Ctor" reason:nil userInfo:nil];
+  return nil;
 }
 
 #pragma mark -

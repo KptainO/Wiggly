@@ -18,14 +18,12 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 #define kWIPlaceholderRegex   [kWIPathSubset stringByAppendingString:kWISubDelimiters]
 #define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
 
-@interface WIRouteBuilder () {
-  NSMutableDictionary  *_placeholders;
-}
+@interface WIRouteBuilder ()
 
-@property(nonatomic, strong)NSDictionary  *placeholders;
-@property(nonatomic, strong)NSString      *pattern;
-@property(nonatomic, strong)WIRoute       *route;
-@property(nonatomic, strong)NSString      *shortPath;
+@property(nonatomic, strong)NSString        *pattern;
+@property(nonatomic, strong)WIRoute         *route;
+@property(nonatomic, strong)NSString        *shortPath;
+@property(nonatomic, strong)NSMutableArray  *placeholders_;
 
 - (void)_build;
 
@@ -76,7 +74,8 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
                                            range:NSMakeRange(0, self.route.path.length)];
 
 
-  for (NSTextCheckingResult *placeholderMatch in placeholders) {
+  for (NSTextCheckingResult *placeholderMatch in placeholders)
+  {
     NSRange matchRange = [placeholderMatch range];
     NSRange placeholderRange = [placeholderMatch rangeAtIndex:2];
     NSString *variableName = [self.route.path substringWithRange:placeholderRange];
@@ -95,8 +94,12 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
     // Try to determine if first optional segment
     // Optional part is obviously at the current end of building patten
     // and at placeholder position inside path
-    if (!placeholder.required && !optSegment)
-      optSegment = @{@"regexIdx": @(pattern.length), @"pathIdx": @([placeholderMatch rangeAtIndex:1].location) };
+    if (self.route.defaults[variableName] && !optSegment)
+      optSegment = @{
+        @"regexIdx": @(pattern.length),
+        @"pathIdx": @([placeholderMatch rangeAtIndex:1].location),
+        @"placeholderIdx": @(self.placeholders.count - 1)
+      };
 
     [pattern appendString:placeholder.pattern];
 
@@ -114,6 +117,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 
   /**
    * There is an optional segment this means that:
+   * - some placeholders are in fact optional, so mark them as
    * - we can generate a shorter path
    * - regex will contain an optional matching segment
    */
@@ -128,6 +132,10 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
       pathOptSegIdx -= 1;
     }
 
+    // Set every placeholder which is in the optional segment as optional
+    for (int i = [optSegment[@"placeholderIdx"] intValue]; i < self.placeholders.count; ++i)
+      [self.placeholders[i] setRequired:NO];
+
     // Generate short path
     self.shortPath = [self.path substringToIndex:pathOptSegIdx];
 
@@ -140,16 +148,14 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 }
 
 - (WIRoutePlaceholder *)_addRoutePlaceholder:(NSString *)name {
-  WIRoutePlaceholder  *placeholder = [[WIRoutePlaceholder alloc] init];
+  WIRoutePlaceholder  *placeholder = [[WIRoutePlaceholder alloc] initWithName:name];
 
   if (self.route.requirements[name])
     placeholder.pattern = self.route.requirements[name];
   else
     placeholder.pattern = [NSString stringWithFormat:@"[%@]+", kWIPlaceholderRegex];
 
-  placeholder.required = !self.route.defaults[name];
-
-  _placeholders[name] = placeholder;
+  [self.placeholders_ addObject:placeholder];
 
   return placeholder;
 }
@@ -159,11 +165,15 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   {
     _route = route;
 
-    self.placeholders = [NSMutableDictionary dictionary];
+    self.placeholders_ = [NSMutableArray array];
     self.shortPath = nil;
     
     [self _build];
   }
+}
+
+- (NSArray *)placeholders {
+  return self.placeholders_;
 }
 
 @end
