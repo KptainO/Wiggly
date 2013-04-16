@@ -8,15 +8,15 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import "WIRoute.h"
-#import "WIRoutePattern.h"
+#import "WIRouteBuilder.h"
 
-@interface WIRoutePatternTests : SenTestCase
+@interface WIRouteBuilderTests : SenTestCase
 @end
 
-@implementation WIRoutePatternTests
+@implementation WIRouteBuilderTests
 
 - (void)testWithPlaceholder {
-  WIRoutePattern *pattern = [self _routePattern:@"/blog/:page"
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
                                    requirements:@{@"page": @"\\d+"}
                                        defaults:nil];
 
@@ -24,7 +24,7 @@
 }
 
 - (void)testWithTwoPlaceholders {
-  WIRoutePattern *pattern = [self _routePattern:@"/blog/:page/:id"
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/:id"
                                    requirements:@{@"page": @"\\w+", @"id": @"[0-9]"}
                                        defaults:nil];
 
@@ -32,7 +32,7 @@
 }
 
 - (void)testWithTrailingBackslash {
-  WIRoutePattern *pattern = [self _routePattern:@"/blog/:page/"
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/"
                                    requirements:@{@"page": @"[0-9]{1,2}"}
                                        defaults:nil];
 
@@ -40,7 +40,7 @@
 }
 
 - (void)testWithStaticTextAtTheEnd {
-  WIRoutePattern *pattern = [self _routePattern:@"/blog/:page/show"
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/show"
                                    requirements:@{@"page" : @"\\d+"}
                                        defaults:nil];
 
@@ -48,7 +48,7 @@
 }
 
 - (void)testWithOptionalPlaceholderAtTheEnd {
-  WIRoutePattern *pattern = [self _routePattern:@"/blog/:page"
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
                                    requirements:@{@"page": @"\\d+"}
                                        defaults:@{@"page": @"1"}];
 
@@ -56,13 +56,13 @@
 }
 
 - (void)testWithRequiredAndOptionalPlaceholderAtTheEnd {
-  WIRoutePattern *pattern = [self _routePattern:@"/blog/:page/show/:id/and/:foo"
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page/show/:id/and/:foo"
                                    requirements:@{@"page" : @"\\d+", @"id": @"\\d+", @"foo": @"\\d+"} defaults:@{@"foo": @1, @"id": @2}];
   STAssertEqualObjects(pattern.pattern, @"/blog/\\d+/show/\\d+/and(/\\d+)?", nil);
 }
 
 - (void)testWithOptionalPlaceholdersNotAtTheEnd {
-  WIRoutePattern  *pattern = [self _routePattern:@"/blog/:page/show/:id/last"
+  WIRouteBuilder  *pattern = [self _routePattern:@"/blog/:page/show/:id/last"
                                     requirements:@{@"page": @"\\d+", @"id": @"\\d+"}
                                         defaults:@{@"id": @2}];
 
@@ -70,14 +70,30 @@
 }
 
 - (void)testWithStaticTextBetweenTwoOptionalPlaceholders {
-  WIRoutePattern  *pattern = [self _routePattern:@"/blog/:page/show/:id"
+  WIRouteBuilder  *pattern = [self _routePattern:@"/blog/:page/show/:id"
                                     requirements:@{@"page": @"\\d+", @"id": @"\\d+"}
                                         defaults:@{@"id": @2}];
 
   STAssertEqualObjects(pattern.pattern, @"/blog/\\d+/show(/\\d+)?", nil);
 }
 
-- (WIRoutePattern *)_routePattern:(NSString *)path
+- (void)testShortPathEqualLongPath {
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
+                                   requirements:nil
+                                       defaults:nil];
+
+  STAssertEqualObjects(pattern.shortPath, pattern.path, nil);
+}
+
+- (void)testShortPathShorterThanLongPath {
+  WIRouteBuilder *pattern = [self _routePattern:@"/blog/:page"
+                                   requirements:nil
+                                       defaults:@{@"page": @1}];
+
+  STAssertEqualObjects(pattern.shortPath, @"/blog", nil);
+}
+
+- (WIRouteBuilder *)_routePattern:(NSString *)path
                      requirements:(NSDictionary *)requirements
                          defaults:(NSDictionary *)defaults {
   WIRoute *route = [WIRoute routeWithPath:path];
@@ -88,7 +104,7 @@
   for (id def in defaults)
     route.defaults[def] = defaults[def];
 
-  return [[WIRoutePattern alloc] initWithRoute:route];
+  return [[WIRouteBuilder alloc] initWithRoute:route];
 }
 
 @end

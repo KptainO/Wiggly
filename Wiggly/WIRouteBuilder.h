@@ -10,7 +10,7 @@
 
 @class WIRoute;
 
-@interface WIRoutePattern : NSObject
+@interface WIRouteBuilder : NSObject
 @property(nonatomic, strong, readonly)NSDictionary  *placeholders;
 @property(nonatomic, strong, readonly)NSString      *pattern;
 @property(nonatomic, strong, readonly)NSString      *path;

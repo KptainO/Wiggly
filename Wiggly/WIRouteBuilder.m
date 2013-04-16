@@ -6,7 +6,7 @@
 // file that was distributed with this source code.
 //
 
-#import "WIRoutePattern.h"
+#import "WIRouteBuilder.h"
 
 #import "WIRoute.h"
 #import "WIRoutePlaceholder.h"
@@ -18,7 +18,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 #define kWIPlaceholderRegex   [kWIPathSubset stringByAppendingString:kWISubDelimiters]
 #define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
 
-@interface WIRoutePattern () {
+@interface WIRouteBuilder () {
   NSMutableDictionary  *_placeholders;
 }
 
@@ -31,7 +31,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 
 @end
 
-@implementation WIRoutePattern
+@implementation WIRouteBuilder
 
 #pragma mark -
 #pragma mark Initialization
@@ -55,6 +55,10 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 
 - (NSString *)path {
   return self.route.path;
+}
+
+- (NSString *)shortPath {
+  return _shortPath ? _shortPath : self.path;
 }
 
 #pragma mark -
@@ -156,6 +160,8 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
     _route = route;
 
     self.placeholders = [NSMutableDictionary dictionary];
+    self.shortPath = nil;
+    
     [self _build];
   }
 }

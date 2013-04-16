@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		49193087171064B20031845A /* WIRouting.m in Sources */ = {isa = PBXBuildFile; fileRef = 49193086171064B20031845A /* WIRouting.m */; };
 		495D4C5017062E2B00BCFCF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D4C4F17062E2B00BCFCF4 /* Foundation.framework */; };
 		495D4C5F17062E2C00BCFCF4 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D4C5E17062E2C00BCFCF4 /* SenTestingKit.framework */; };
 		495D4C6117062E2C00BCFCF4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D4C6017062E2C00BCFCF4 /* UIKit.framework */; };
@@ -14,8 +15,8 @@
 		495D4C6517062E2C00BCFCF4 /* libWiggly.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D4C4C17062E2B00BCFCF4 /* libWiggly.a */; };
 		495D4C6B17062E2C00BCFCF4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 495D4C6917062E2C00BCFCF4 /* InfoPlist.strings */; };
 		495D4C7C17062E8800BCFCF4 /* WIRoute.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C7B17062E8800BCFCF4 /* WIRoute.m */; };
-		495D4C8217064C2100BCFCF4 /* WIRoutePattern.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8117064C2100BCFCF4 /* WIRoutePattern.m */; };
-		495D4C8817065C0C00BCFCF4 /* WIRoutePatternTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8717065C0C00BCFCF4 /* WIRoutePatternTests.m */; };
+		495D4C8217064C2100BCFCF4 /* WIRouteBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8117064C2100BCFCF4 /* WIRouteBuilder.m */; };
+		495D4C8817065C0C00BCFCF4 /* WIRouteBuilderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */; };
 		49EB915C1708687000D356E6 /* WIRoutePlaceholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +43,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		49193085171064B20031845A /* WIRouting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouting.h; sourceTree = "<group>"; };
+		49193086171064B20031845A /* WIRouting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouting.m; sourceTree = "<group>"; };
 		495D4C4C17062E2B00BCFCF4 /* libWiggly.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libWiggly.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		495D4C4F17062E2B00BCFCF4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		495D4C5317062E2B00BCFCF4 /* Wiggly-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wiggly-Prefix.pch"; sourceTree = "<group>"; };
@@ -52,9 +55,9 @@
 		495D4C6A17062E2C00BCFCF4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		495D4C7A17062E8800BCFCF4 /* WIRoute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRoute.h; sourceTree = "<group>"; };
 		495D4C7B17062E8800BCFCF4 /* WIRoute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRoute.m; sourceTree = "<group>"; };
-		495D4C8017064C2100BCFCF4 /* WIRoutePattern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRoutePattern.h; sourceTree = "<group>"; };
-		495D4C8117064C2100BCFCF4 /* WIRoutePattern.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRoutePattern.m; sourceTree = "<group>"; };
-		495D4C8717065C0C00BCFCF4 /* WIRoutePatternTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRoutePatternTests.m; sourceTree = "<group>"; };
+		495D4C8017064C2100BCFCF4 /* WIRouteBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouteBuilder.h; sourceTree = "<group>"; };
+		495D4C8117064C2100BCFCF4 /* WIRouteBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteBuilder.m; sourceTree = "<group>"; };
+		495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteBuilderTests.m; sourceTree = "<group>"; };
 		49EB915A1708687000D356E6 /* WIRoutePlaceholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRoutePlaceholder.h; sourceTree = "<group>"; };
 		49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRoutePlaceholder.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -114,30 +117,24 @@
 		495D4C5117062E2B00BCFCF4 /* Wiggly */ = {
 			isa = PBXGroup;
 			children = (
-				495D4C5217062E2B00BCFCF4 /* Supporting Files */,
+				495D4C5317062E2B00BCFCF4 /* Wiggly-Prefix.pch */,
 				495D4C7A17062E8800BCFCF4 /* WIRoute.h */,
 				495D4C7B17062E8800BCFCF4 /* WIRoute.m */,
-				495D4C8017064C2100BCFCF4 /* WIRoutePattern.h */,
-				495D4C8117064C2100BCFCF4 /* WIRoutePattern.m */,
+				495D4C8017064C2100BCFCF4 /* WIRouteBuilder.h */,
+				495D4C8117064C2100BCFCF4 /* WIRouteBuilder.m */,
 				49EB915A1708687000D356E6 /* WIRoutePlaceholder.h */,
 				49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */,
+				49193085171064B20031845A /* WIRouting.h */,
+				49193086171064B20031845A /* WIRouting.m */,
 			);
 			path = Wiggly;
-			sourceTree = "<group>";
-		};
-		495D4C5217062E2B00BCFCF4 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				495D4C5317062E2B00BCFCF4 /* Wiggly-Prefix.pch */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		495D4C6617062E2C00BCFCF4 /* WigglyTests */ = {
 			isa = PBXGroup;
 			children = (
 				495D4C6717062E2C00BCFCF4 /* Supporting Files */,
-				495D4C8717065C0C00BCFCF4 /* WIRoutePatternTests.m */,
+				495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */,
 			);
 			path = WigglyTests;
 			sourceTree = "<group>";
@@ -250,8 +247,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				495D4C7C17062E8800BCFCF4 /* WIRoute.m in Sources */,
-				495D4C8217064C2100BCFCF4 /* WIRoutePattern.m in Sources */,
+				495D4C8217064C2100BCFCF4 /* WIRouteBuilder.m in Sources */,
 				49EB915C1708687000D356E6 /* WIRoutePlaceholder.m in Sources */,
+				49193087171064B20031845A /* WIRouting.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,7 +257,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				495D4C8817065C0C00BCFCF4 /* WIRoutePatternTests.m in Sources */,
+				495D4C8817065C0C00BCFCF4 /* WIRouteBuilderTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
