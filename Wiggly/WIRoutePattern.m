@@ -15,7 +15,7 @@ NSString  *const kWIPlaceholderNameRegex = @":(\\w+)";
 NSString  *const kWIPathSubset = @"0-9a-z-._%";
 NSString  *const kWISubDelimiters = @";,*+$!)(";
 
-#define kWIOptPlaceholderNone -1
+//#define kWIoptSegmentNone -1
 #define kWIPlaceholderRegex   [kWIPathSubset stringByAppendingString:kWISubDelimiters]
 #define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
 
@@ -26,6 +26,8 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 @property(nonatomic, strong)NSDictionary  *placeholders;
 @property(nonatomic, strong)NSString      *pattern;
 @property(nonatomic, strong)WIRoute       *route;
+@property(nonatomic, strong)NSString      *path;
+@property(nonatomic, strong)NSString      *shortPath;
 
 - (NSString *)_buildPattern;
 
@@ -69,14 +71,13 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 - (NSString *)_buildPattern {
   NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
   NSUInteger prevStrIdx = 0;
-  int firstOptionalPlaceholder = kWIOptPlaceholderNone;
-  NSRegularExpression *regex = [NSRegularExpression
-                                regularExpressionWithPattern:kWIPlaceholderNameRegex
-                                options:NSRegularExpressionCaseInsensitive
-                                error:nil];
+  NSDictionary *optSegment = nil;
+  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:kWIPlaceholderNameRegex
+                                                                         options:NSRegularExpressionCaseInsensitive
+                                                                           error:nil];
   NSArray *placeholders = [regex matchesInString:self.route.path
-                                    options:NSMatchingReportCompletion
-                                      range:NSMakeRange(0, self.route.path.length)];
+                                         options:NSMatchingReportCompletion
+                                           range:NSMakeRange(0, self.route.path.length)];
 
 
   for (NSTextCheckingResult *placeholderMatch in placeholders) {
@@ -91,13 +92,15 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
     [pattern appendString:prevStr];
 
     // If there is a static text before the placeholder whose not a separator, then
-    // we reset firstOptionalPlaceholder value
-    if (prevStr.length > 1 ||
-        [prevStr rangeOfCharacterFromSet:kWISeparatorSet].location == NSNotFound)
-      firstOptionalPlaceholder = kWIOptPlaceholderNone;
-    // Try to determine if first optional placeholder
-    if (!placeholder.required && firstOptionalPlaceholder == kWIOptPlaceholderNone)
-      firstOptionalPlaceholder = pattern.length;
+    // we reset regexOptSegIdx value
+    if (prevStr.length > 1 || [prevStr rangeOfCharacterFromSet:kWISeparatorSet].location == NSNotFound)
+      optSegment = nil;
+    
+    // Try to determine if first optional segment
+    // Optional part is obviously at the current end of building patten
+    // and at placeholder position inside path
+    if (!placeholder.required && !optSegment)
+      optSegment = @{@"regexIdx" : @(pattern.length), @"pathIdx": @(placeholderRange.location) };
 
     [pattern appendString:placeholder.pattern];
 
@@ -110,16 +113,23 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   {
     [pattern appendString:[self.route.path substringFromIndex:prevStrIdx]];
 
-    firstOptionalPlaceholder = kWIOptPlaceholderNone;
+    optSegment = nil;
   }
 
-  // Set optional placeholder as optional inside regex by surrounding with ()?
-  if (firstOptionalPlaceholder != kWIOptPlaceholderNone)
+  /**
+   * There is an optional segment this means that:
+   * - we can generate a shorter path
+   * - regex will contain an optional matching segment
+   */
+  if (optSegment)
   {
-    if ([pattern characterAtIndex:firstOptionalPlaceholder - 1] == '/')
-      firstOptionalPlaceholder -= 1;
+    int regexOptSegIdx = [optSegment[@"regexIdx"] intValue];
 
-    [pattern insertString:@"(" atIndex:firstOptionalPlaceholder];
+    if ([pattern characterAtIndex:regexOptSegIdx - 1] == '/')
+      regexOptSegIdx -= 1;
+
+    // Update pattern
+    [pattern insertString:@"(" atIndex:regexOptSegIdx];
     [pattern appendString:@")?"];
   }
 

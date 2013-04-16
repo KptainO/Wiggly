@@ -14,10 +14,10 @@
 @property(nonatomic, strong, readonly)NSDictionary  *placeholders;
 @property(nonatomic, strong, readonly)NSString      *pattern;
 @property(nonatomic, strong, readonly)WIRoute       *route;
+@property(nonatomic, strong, readonly)NSString      *path;
+@property(nonatomic, strong, readonly)NSString      *shortPath;
 
 - (id)initWithRoute:(WIRoute *)route;
-
-//- (void)generate:(WIRoute *)route;
 
 - (NSString *)generate:(NSDictionary *)variables;
 - (NSArray *)matches:(NSString *)routePath;
