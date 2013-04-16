@@ -11,11 +11,10 @@
 #import "WIRoute.h"
 #import "WIRoutePlaceholder.h"
 
-NSString  *const kWIPlaceholderNameRegex = @":(\\w+)";
+NSString  *const kWIPlaceholderNameRegex = @"(:(\\w+))";
 NSString  *const kWIPathSubset = @"0-9a-z-._%";
 NSString  *const kWISubDelimiters = @";,*+$!)(";
 
-//#define kWIoptSegmentNone -1
 #define kWIPlaceholderRegex   [kWIPathSubset stringByAppendingString:kWISubDelimiters]
 #define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
 
@@ -26,10 +25,9 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 @property(nonatomic, strong)NSDictionary  *placeholders;
 @property(nonatomic, strong)NSString      *pattern;
 @property(nonatomic, strong)WIRoute       *route;
-@property(nonatomic, strong)NSString      *path;
 @property(nonatomic, strong)NSString      *shortPath;
 
-- (NSString *)_buildPattern;
+- (void)_build;
 
 @end
 
@@ -42,9 +40,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   if (!(self = [super init]))
     return nil;
 
-  self.placeholders = [NSMutableDictionary dictionary];
   self.route = route;
-  self.pattern = [self _buildPattern];
 
   return self;
 }
@@ -55,20 +51,16 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 }
 
 #pragma mark -
-#pragma mark Methods
+#pragma WIRoute proxy methods
 
-- (NSString *)generate:(NSDictionary *)variables {
-  
-}
-
-- (NSArray *)matches:(NSString *)routePath {
-  
+- (NSString *)path {
+  return self.route.path;
 }
 
 #pragma mark -
 #pragma mark Protected Methods
 
-- (NSString *)_buildPattern {
+- (void)_build {
   NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
   NSUInteger prevStrIdx = 0;
   NSDictionary *optSegment = nil;
@@ -82,7 +74,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 
   for (NSTextCheckingResult *placeholderMatch in placeholders) {
     NSRange matchRange = [placeholderMatch range];
-    NSRange placeholderRange = [placeholderMatch rangeAtIndex:1];
+    NSRange placeholderRange = [placeholderMatch rangeAtIndex:2];
     NSString *variableName = [self.route.path substringWithRange:placeholderRange];
     NSString *prevStr = [self.route.path substringWithRange:
                                       NSMakeRange(prevStrIdx, matchRange.location - prevStrIdx)];
@@ -100,7 +92,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
     // Optional part is obviously at the current end of building patten
     // and at placeholder position inside path
     if (!placeholder.required && !optSegment)
-      optSegment = @{@"regexIdx" : @(pattern.length), @"pathIdx": @(placeholderRange.location) };
+      optSegment = @{@"regexIdx": @(pattern.length), @"pathIdx": @([placeholderMatch rangeAtIndex:1].location) };
 
     [pattern appendString:placeholder.pattern];
 
@@ -124,16 +116,23 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   if (optSegment)
   {
     int regexOptSegIdx = [optSegment[@"regexIdx"] intValue];
+    int pathOptSegIdx = [optSegment[@"pathIdx"] intValue];
 
     if ([pattern characterAtIndex:regexOptSegIdx - 1] == '/')
+    {
       regexOptSegIdx -= 1;
+      pathOptSegIdx -= 1;
+    }
+
+    // Generate short path
+    self.shortPath = [self.path substringToIndex:pathOptSegIdx];
 
     // Update pattern
     [pattern insertString:@"(" atIndex:regexOptSegIdx];
     [pattern appendString:@")?"];
   }
 
-  return [NSString stringWithString:pattern];
+  self.pattern = [NSString stringWithString:pattern];
 }
 
 - (WIRoutePlaceholder *)_addRoutePlaceholder:(NSString *)name {
@@ -149,6 +148,16 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   _placeholders[name] = placeholder;
 
   return placeholder;
+}
+
+- (void)setRoute:(WIRoute *)route {
+  if (route != _route)
+  {
+    _route = route;
+
+    self.placeholders = [NSMutableDictionary dictionary];
+    [self _build];
+  }
 }
 
 @end
