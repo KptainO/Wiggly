@@ -11,7 +11,6 @@
 #import "WIRoute.h"
 #import "WIRoutePlaceholder.h"
 
-NSString  *const kWIPlaceholderNameRegex = @"(:(\\w+))";
 NSString  *const kWIPathSubset = @"0-9a-z-._%";
 NSString  *const kWISubDelimiters = @";,*+$!)(";
 
@@ -20,9 +19,10 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 
 @interface WIRouteBuilder ()
 
-@property(nonatomic, strong)NSString        *pattern;
+@property(nonatomic, strong)NSString        *regex;
 @property(nonatomic, strong)WIRoute         *route;
-@property(nonatomic, strong)NSString        *shortPath;
+@property(nonatomic, strong)NSString        *longPath_;
+@property(nonatomic, strong)NSString        *shortPath_;
 @property(nonatomic, strong)NSMutableArray  *placeholders_;
 
 - (void)_build;
@@ -38,6 +38,8 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   if (!(self = [super init]))
     return nil;
 
+  self.markerDelegate = self;
+
   self.route = route;
 
   return self;
@@ -49,14 +51,27 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 }
 
 #pragma mark -
+#pragma WIRouteBuilderMarkerDelegate methods
+
+- (NSString *)builderMarkerRegex:(WIRouteBuilder *)builder {
+  static NSString  *const marker = @":(\\w+)";
+
+  return marker;
+}
+
+- (NSString *)builder:(WIRouteBuilder *)builder markerForPlaceholder:(WIRoutePlaceholder *)placeholder {
+  return [@":" stringByAppendingString:placeholder.name];
+}
+
+#pragma mark -
 #pragma WIRoute proxy methods
 
 - (NSString *)path {
-  return self.route.path;
+  return self.longPath_;
 }
 
-- (NSString *)shortPath {
-  return _shortPath ? _shortPath : self.path;
+- (NSString *)longPath_ {
+  return self.route.path;
 }
 
 #pragma mark -
@@ -66,7 +81,8 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
   NSUInteger prevStrIdx = 0;
   NSDictionary *optSegment = nil;
-  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:kWIPlaceholderNameRegex
+  NSString *marker = [NSString stringWithFormat:@"(%@)", [self.markerDelegate builderMarkerRegex:self]];
+  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:marker
                                                                          options:NSRegularExpressionCaseInsensitive
                                                                            error:nil];
   NSArray *placeholders = [regex matchesInString:self.route.path
@@ -136,15 +152,15 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
     for (int i = [optSegment[@"placeholderIdx"] intValue]; i < self.placeholders.count; ++i)
       [self.placeholders[i] setRequired:NO];
 
-    // Generate short path
-    self.shortPath = [self.path substringToIndex:pathOptSegIdx];
+    // Generate paths
+    self.shortPath_ = [self.longPath_ substringToIndex:pathOptSegIdx];
 
     // Update pattern
     [pattern insertString:@"(" atIndex:regexOptSegIdx];
     [pattern appendString:@")?"];
   }
 
-  self.pattern = [NSString stringWithString:pattern];
+  self.regex = [NSString stringWithString:pattern];
 }
 
 - (WIRoutePlaceholder *)_addRoutePlaceholder:(NSString *)name {
@@ -166,7 +182,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
     _route = route;
 
     self.placeholders_ = [NSMutableArray array];
-    self.shortPath = nil;
+    self.shortPath_ = nil;
     
     [self _build];
   }

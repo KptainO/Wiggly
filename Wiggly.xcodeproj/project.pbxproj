@@ -60,6 +60,7 @@
 		495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteBuilderTests.m; sourceTree = "<group>"; };
 		49EB915A1708687000D356E6 /* WIRoutePlaceholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRoutePlaceholder.h; sourceTree = "<group>"; };
 		49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRoutePlaceholder.m; sourceTree = "<group>"; };
+		49FB75B217248D5E00B9A627 /* WIRoutable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WIRoutable.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				495D4C5317062E2B00BCFCF4 /* Wiggly-Prefix.pch */,
+				49FB75B217248D5E00B9A627 /* WIRoutable.h */,
 				495D4C7A17062E8800BCFCF4 /* WIRoute.h */,
 				495D4C7B17062E8800BCFCF4 /* WIRoute.m */,
 				495D4C8017064C2100BCFCF4 /* WIRouteBuilder.h */,
