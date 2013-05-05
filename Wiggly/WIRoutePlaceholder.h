@@ -10,10 +10,12 @@
 
 @interface WIRoutePlaceholder : NSObject
 
-@property(nonatomic, copy, readonly)NSString  *name;
-@property(nonatomic, strong)NSString            *pattern;
+@property(nonatomic, copy, readonly)NSString    *name;
+@property(nonatomic, strong)NSString            *conditions;
 @property(nonatomic)BOOL                        required;
 
 - (id)initWithName:(NSString *)name;
+
+- (BOOL)matchConditions:(NSString *)value;
 
 @end

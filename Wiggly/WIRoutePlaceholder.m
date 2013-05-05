@@ -35,8 +35,14 @@
 #pragma mark -
 #pragma mark Methods
 
+- (BOOL)matchConditions:(NSString *)value {
+  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.conditions options:0 error:nil];
+
+  return [regex matchesInString:value options:0 range:NSMakeRange(0, value.length)].count > 0;
+}
+
 - (NSString *)description {
-  return self.pattern;
+  return self.conditions;
 }
 
 @end

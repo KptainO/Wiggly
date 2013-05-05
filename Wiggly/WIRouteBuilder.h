@@ -22,12 +22,9 @@
 @end
 
 @protocol WIRouteBuilderDelegate <NSObject>
-- (NSDictionary *)builder:(WIRouteBuilder *)builder willUseVariables:(NSDictionary *)variables;
+- (NSDictionary *)builder:(WIRouteBuilder *)builder willUseValues:(NSDictionary *)values;
+- (NSDictionary *)builder:(WIRouteBuilder *)builder didReceivedValues:(NSDictionary *)values;
 
-- (NSDictionary *)builder:(WIRouteBuilder *)builder didReceivedValue:(id)value forPlaceholder:(WIRoutePlaceholder *)placeholder;
-
-@optional
-- (NSDictionary *)builder:(WIRouteBuilder *)builder variablesFrom:(id)data;
 @end
 
 @interface WIRouteBuilder : NSObject<WIRoutable, WIRouteBuilderMarkerDelegate>
