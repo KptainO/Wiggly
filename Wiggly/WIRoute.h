@@ -8,9 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WIRoute : NSObject
+#import "WIRoutable.h"
 
-@property(nonatomic, strong, readonly)NSString          *path;
+@interface WIRoute : NSObject<WIRoutable>
+
+@property(nonatomic, strong, readonly)NSString            *path;
 @property(nonatomic, strong, readonly)NSMutableDictionary *requirements;
 @property(nonatomic, strong, readonly)NSMutableDictionary *defaults;
 
