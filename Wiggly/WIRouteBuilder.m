@@ -54,6 +54,36 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   return nil;
 }
 
+- (NSString *)generate:(NSDictionary *)values {
+
+}
+
+- (NSDictionary *)match:(NSString *)pattern {
+  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.regex options:0 error:nil];
+  NSTextCheckingResult *matches = [regex firstMatchInString:pattern options:0 range:NSMakeRange(0, pattern.length)];
+  NSMutableDictionary *values = [NSMutableDictionary dictionary];
+  NSMutableDictionary *allValues = nil;
+
+  if (!matches)
+    return nil;
+
+  for (WIRoutePlaceholder *placeholder in self.placeholders) {
+    NSUInteger rangeIdx = [self.placeholdersMeta_[placeholder.name][kWIMetaMatchingCommaIdx] intValue];
+    NSRange valueRange = [matches rangeAtIndex:rangeIdx];
+
+    if (valueRange.location != NSNotFound)
+      values[placeholder.name] = [pattern substringWithRange:valueRange];
+  }
+
+  if (self.delegate)
+    values.dictionary = [self.delegate builder:self didReceivedValues:values];
+
+  allValues = [NSMutableDictionary dictionaryWithDictionary:self.defaults];
+  [allValues addEntriesFromDictionary:values];
+  
+  return allValues;
+}
+
 #pragma mark -
 #pragma WIRouteBuilderMarkerDelegate methods
 
@@ -74,6 +104,10 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   return self.longPath_;
 }
 
+- (NSDictionary *)defaults {
+  return self.route.defaults;
+}
+
 - (NSString *)longPath_ {
   return self.route.path;
 }
@@ -82,6 +116,8 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
 #pragma mark Protected Methods
 
 - (void)_build {
+  // track how many capture comma we have so far inside the generated regex
+  NSUInteger numberOfCommaGroups = 0;
   NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
   NSUInteger prevStrIdx = 0;
   NSDictionary *optSegment = nil;
@@ -121,13 +157,13 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
         @"placeholderIdx": @(self.placeholders.count - 1)
       };
 
-    [pattern appendString:placeholder.conditions];
+    [pattern appendString:[NSString stringWithFormat:@"(%@)", placeholder.conditions]];
 
     self.placeholdersMeta_[placeholder.name] = [NSMutableDictionary dictionaryWithDictionary:@{
-    // 1 is the global matching comma added around marker
-    // regex.numberOfCaptureGroups allow us to skip any commas that may be inside delegated marker
-    kWIMetaMatchingCommaIdx : @(1 + regex.numberOfCaptureGroups * self.placeholdersMeta_.count)
+    kWIMetaMatchingCommaIdx : @(1 + numberOfCommaGroups)
     }];
+
+    numberOfCommaGroups += 1 + [NSRegularExpression regularExpressionWithPattern:placeholder.conditions options:0 error:nil].numberOfCaptureGroups;
 
     prevStrIdx = matchRange.location + matchRange.length;
   }

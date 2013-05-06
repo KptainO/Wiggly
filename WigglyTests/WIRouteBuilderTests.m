@@ -21,7 +21,7 @@
                                    requirements:@{@"page": @"\\d+"}
                                        defaults:nil];
 
-  STAssertEqualObjects(builder.regex, @"/blog/\\d+", nil);
+  STAssertEqualObjects(builder.regex, @"/blog/(\\d+)", nil);
 }
 
 - (void)testWithTwoPlaceholders {
@@ -29,7 +29,7 @@
                                    requirements:@{@"page": @"\\w+", @"id": @"[0-9]"}
                                        defaults:nil];
 
-  STAssertEqualObjects(builder.regex, @"/blog/\\w+/[0-9]", nil);
+  STAssertEqualObjects(builder.regex, @"/blog/(\\w+)/([0-9])", nil);
 }
 
 - (void)testWithTrailingBackslash {
@@ -37,7 +37,7 @@
                                    requirements:@{@"page": @"[0-9]{1,2}"}
                                        defaults:nil];
 
-  STAssertEqualObjects(builder.regex, @"/blog/[0-9]{1,2}/", nil);
+  STAssertEqualObjects(builder.regex, @"/blog/([0-9]{1,2})/", nil);
 }
 
 - (void)testWithStaticTextAtTheEnd {
@@ -45,7 +45,7 @@
                                    requirements:@{@"page" : @"\\d+"}
                                        defaults:nil];
 
-  STAssertEqualObjects(builder.regex, @"/blog/\\d+/show", nil);
+  STAssertEqualObjects(builder.regex, @"/blog/(\\d+)/show", nil);
 }
 
 - (void)testWithOptionalPlaceholderAtTheEnd {
@@ -53,13 +53,13 @@
                                    requirements:@{@"page": @"\\d+"}
                                        defaults:@{@"page": @"1"}];
 
-  STAssertEqualObjects(builder.regex, @"/blog(/\\d+)?", nil);
+  STAssertEqualObjects(builder.regex, @"/blog(/(\\d+))?", nil);
 }
 
 - (void)testWithRequiredAndOptionalPlaceholderAtTheEnd {
   WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page/show/:id/and/:foo"
                                    requirements:@{@"page" : @"\\d+", @"id": @"\\d+", @"foo": @"\\d+"} defaults:@{@"foo": @1, @"id": @2}];
-  STAssertEqualObjects(builder.regex, @"/blog/\\d+/show/\\d+/and(/\\d+)?", nil);
+  STAssertEqualObjects(builder.regex, @"/blog/(\\d+)/show/(\\d+)/and(/(\\d+))?", nil);
 }
 
 - (void)testWithOptionalPlaceholdersNotAtTheEnd {
@@ -67,7 +67,7 @@
                                     requirements:@{@"page": @"\\d+", @"id": @"\\d+"}
                                         defaults:@{@"id": @2}];
 
-  STAssertEqualObjects(builder.regex, @"/blog/\\d+/show/\\d+/last", nil);
+  STAssertEqualObjects(builder.regex, @"/blog/(\\d+)/show/(\\d+)/last", nil);
 }
 
 - (void)testWithStaticTextBetweenTwoOptionalPlaceholders {
@@ -75,7 +75,7 @@
                                     requirements:@{@"page": @"\\d+", @"id": @"\\d+"}
                                         defaults:@{@"id": @2}];
 
-  STAssertEqualObjects(builder.regex, @"/blog/\\d+/show(/\\d+)?", nil);
+  STAssertEqualObjects(builder.regex, @"/blog/(\\d+)/show(/(\\d+))?", nil);
 }
 
 //- (void)testShortPathEqualLongPath {
@@ -109,6 +109,45 @@
 
   for (WIRoutePlaceholder *holder in builder.placeholders)
     STAssertTrue(holder.required, @"'%@' holder is not set to required", holder.name);
+}
+
+- (void)testMatch {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page"
+                                 requirements:nil
+                                     defaults:nil];
+
+
+  NSDictionary *matches = [builder match:@"/blog/5"];
+
+  STAssertEquals((int)matches.count, 1, nil);
+  STAssertEqualObjects(matches[@"page"], @"5", nil);
+}
+
+- (void)testDontMatchRequirements {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page"
+                                 requirements:@{@"page": @"\\d+"}
+                                     defaults:nil];
+
+  STAssertNil([builder match:@"/blog/foo"], nil);
+}
+
+- (void)testMatchOptionalSegment {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page/:show/:id"
+                                 requirements:nil
+                                     defaults:@{@"show": @1, @"id": @2}];
+  NSDictionary *matches = [builder match:@"/blog/5"];
+
+  STAssertEqualObjects(matches[@"page"], @"5", nil);
+  STAssertEqualObjects(matches[@"show"], @1, nil);
+  STAssertEqualObjects(matches[@"id"], @2, nil);
+}
+
+- (void)testDontMatch {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page"
+                                 requirements:nil
+                                     defaults:nil];
+
+  STAssertEquals((int)[builder match:@"/blog"], 0, nil);
 }
 
 - (WIRouteBuilder *)_routeRegex:(NSString *)path

@@ -31,11 +31,15 @@
 @property(nonatomic, strong, readonly)NSArray               *placeholders;
 @property(nonatomic, strong, readonly)NSDictionary          *requirements;
 @property(nonatomic, strong, readonly)NSString              *path;
+@property(nonatomic, strong, readonly)NSDictionary          *defaults;
 
 @property(nonatomic, strong, readonly)NSString              *regex;
 @property(nonatomic, weak)id<WIRouteBuilderMarkerDelegate>  markerDelegate;
 @property(nonatomic, weak)id<WIRouteBuilderDelegate>        delegate;
 
 - (id)initWithRoute:(WIRoute *)route;
+
+- (NSString *)generate:(NSDictionary *)values;
+- (NSDictionary *)match:(NSString *)path;
 
 @end
