@@ -150,6 +150,58 @@
   STAssertEquals((int)[builder match:@"/blog"], 0, nil);
 }
 
+- (void)testGenerate {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page"
+                                 requirements:nil
+                                     defaults:nil];
+  NSString *url = [builder generate:@{@"page": @5}];
+
+  STAssertEqualObjects(url, @"/blog/5", nil);
+}
+
+- (void)testGenerateShort {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page/:id"
+                                 requirements:nil
+                                     defaults:@{ @"id": @1 }];
+
+  NSString *url = [builder generate:@{ @"page": @5}];
+  STAssertEqualObjects(url, @"/blog/5", nil);
+}
+
+- (void)testGenerateDefaults {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page/:id"
+                                 requirements:nil
+                                     defaults:@{ @"id": @1 }];
+
+  NSString *url = [builder generate:@{ @"page": @5, @"id": @6 }];
+  STAssertEqualObjects(url, @"/blog/5/6", nil);
+}
+
+- (void)testGenerateShortWithDefaultsPassed {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page/:id"
+                                 requirements:nil
+                                     defaults:@{ @"id": @6, @"page": @"hello" }];
+
+  NSString *url = [builder generate:@{ @"page": @"hello", @"id": @"6" }];
+  STAssertEqualObjects(url, @"/blog", nil);
+}
+
+- (void)testGenerateRequirementsException {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page"
+                                 requirements:@{ @"page": @"\\d+" }
+                                     defaults:nil];
+
+  STAssertThrows([builder generate:@{ @"page": @"hello"}], nil);
+}
+
+- (void)testGenerateMissingValueException {
+  WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page"
+                                 requirements:nil
+                                     defaults:nil];
+
+  STAssertThrows([builder generate:nil], nil);
+}
+
 - (WIRouteBuilder *)_routeRegex:(NSString *)path
                      requirements:(NSDictionary *)requirements
                          defaults:(NSDictionary *)defaults {
