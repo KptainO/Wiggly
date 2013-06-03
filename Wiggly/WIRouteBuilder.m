@@ -55,7 +55,48 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
 }
 
 - (NSString *)generate:(NSDictionary *)values {
+  NSMutableString *path = [[NSMutableString alloc] init];
+  NSUInteger previousMarkerIdx = 0;
+  NSMutableDictionary *allValues = nil;
+  BOOL shortVersion = [self _shouldGenerateShortPathWithValues:values];
 
+  path.string = shortVersion ? self.shortPath_ : self.longPath_;
+
+  // Merge default values with those provided by user
+  allValues = [NSMutableDictionary dictionaryWithCapacity:self.placeholders.count];
+
+  for (WIRoutePlaceholder *placeholder in self.placeholders)
+    if (!shortVersion || placeholder.required)
+      allValues[placeholder.name] = values[placeholder.name]
+      ? [values[placeholder.name] description]
+      : [self.defaults[placeholder.name] description];
+
+  if (self.delegate)
+    allValues.dictionary = [self.delegate builder:self willUseValues:allValues];
+
+  // replace placeholders with their associated variable value
+  for (WIRoutePlaceholder *placeholder in self.placeholders)
+  {
+    NSString *marker = [self.markerDelegate builder:self markerForPlaceholder:placeholder];
+    NSRange markerRange = [path rangeOfString:marker options:0 range:NSMakeRange(previousMarkerIdx, path.length - previousMarkerIdx)];
+
+    if (markerRange.location == NSNotFound)
+      continue;
+
+    // variable does not fulfill placeholder conditions
+    if (![placeholder matchConditions:allValues[placeholder.name]])
+      @throw [NSException exceptionWithName:@"" reason:@"" userInfo:nil];
+
+    [path replaceOccurrencesOfString:marker
+                          withString:allValues[placeholder.name]
+                             options:0
+                               range:markerRange];
+
+    // Optimization: search next placeholder after the one we've just replaced
+    previousMarkerIdx = markerRange.location;
+  }
+
+  return path;
 }
 
 - (NSDictionary *)match:(NSString *)pattern {
@@ -228,6 +269,26 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   [self.placeholders_ addObject:placeholder];
 
   return placeholder;
+}
+
+- (BOOL)_shouldGenerateShortPathWithValues:(NSDictionary *)values {
+  BOOL useShortPath = YES;
+
+  if (!self.shortPath_)
+    return NO;
+
+  for (WIRoutePlaceholder *placeholder in self.placeholders)
+  {
+    NSString *value = [values[placeholder.name] description];
+
+    if (!placeholder.required && value && ![value isEqualToString:[self.defaults[placeholder.name] description]])
+    {
+      useShortPath = NO;
+      break;
+    }
+  }
+
+  return useShortPath;
 }
 
 - (void)setRoute:(WIRoute *)route {
