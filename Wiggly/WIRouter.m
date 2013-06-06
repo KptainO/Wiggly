@@ -6,18 +6,18 @@
 // file that was distributed with this source code.
 //
 
-#import "WIRouting.h"
+#import "WIRouter.h"
 
 #import "WIRoute.h"
 #import "WIRouteBuilder.h"
 
-@interface WIRouting ()
+@interface WIRouter ()
 @property(nonatomic, strong)WIRoute         *route_;
 @property(nonatomic, strong)WIRouteBuilder  *builder_;
 @property(nonatomic, assign)Class           builderClass_;
 @end
 
-@implementation WIRouting
+@implementation WIRouter
 
 @synthesize builder_ = builder_;
 
@@ -42,7 +42,7 @@
 #pragma mark Methods
 
 - (NSString *)route:(id)object {
-  NSDictionary *values = (NSDictionary *)values;
+  NSDictionary *values = (NSDictionary *)object;
 
   if (![values isKindOfClass:[NSDictionary class]])
   {
@@ -54,7 +54,7 @@
   return [self.builder_ generate:values];
 }
 
-- (id)matches:(NSString *)route {
+- (id)match:(NSString *)route {
   return [self.builder_ match:route];
 }
 

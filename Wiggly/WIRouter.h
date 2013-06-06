@@ -11,13 +11,13 @@
 @class WIRoute;
 @class WIRouteBuilder;
 
-@interface WIRouting : NSObject
+@interface WIRouter : NSObject
 
 - (id)initWithRoute:(WIRoute *)route;
 - (id)initWithRoute:(WIRoute *)route builder:(Class)builder;
 
 - (NSString *)route:(id)data;
 
-- (id)matches:(NSString *)pattern;
+- (id)match:(NSString *)pattern;
 
 @end
