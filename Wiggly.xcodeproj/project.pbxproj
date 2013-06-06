@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		49193087171064B20031845A /* WIRouting.m in Sources */ = {isa = PBXBuildFile; fileRef = 49193086171064B20031845A /* WIRouting.m */; };
+		49193087171064B20031845A /* WIRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = 49193086171064B20031845A /* WIRouter.m */; };
+		49322F0417611E5900308F4F /* WIRouterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 49322F0317611E5900308F4F /* WIRouterTests.m */; };
 		495D4C5017062E2B00BCFCF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D4C4F17062E2B00BCFCF4 /* Foundation.framework */; };
 		495D4C5F17062E2C00BCFCF4 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D4C5E17062E2C00BCFCF4 /* SenTestingKit.framework */; };
 		495D4C6117062E2C00BCFCF4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D4C6017062E2C00BCFCF4 /* UIKit.framework */; };
@@ -43,8 +44,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		49193085171064B20031845A /* WIRouting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouting.h; sourceTree = "<group>"; };
-		49193086171064B20031845A /* WIRouting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouting.m; sourceTree = "<group>"; };
+		49193085171064B20031845A /* WIRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouter.h; sourceTree = "<group>"; };
+		49193086171064B20031845A /* WIRouter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouter.m; sourceTree = "<group>"; };
+		49322F0317611E5900308F4F /* WIRouterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouterTests.m; sourceTree = "<group>"; };
 		495D4C4C17062E2B00BCFCF4 /* libWiggly.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libWiggly.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		495D4C4F17062E2B00BCFCF4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		495D4C5317062E2B00BCFCF4 /* Wiggly-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wiggly-Prefix.pch"; sourceTree = "<group>"; };
@@ -126,8 +128,8 @@
 				495D4C8117064C2100BCFCF4 /* WIRouteBuilder.m */,
 				49EB915A1708687000D356E6 /* WIRoutePlaceholder.h */,
 				49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */,
-				49193085171064B20031845A /* WIRouting.h */,
-				49193086171064B20031845A /* WIRouting.m */,
+				49193085171064B20031845A /* WIRouter.h */,
+				49193086171064B20031845A /* WIRouter.m */,
 			);
 			path = Wiggly;
 			sourceTree = "<group>";
@@ -137,6 +139,7 @@
 			children = (
 				495D4C6717062E2C00BCFCF4 /* Supporting Files */,
 				495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */,
+				49322F0317611E5900308F4F /* WIRouterTests.m */,
 			);
 			path = WigglyTests;
 			sourceTree = "<group>";
@@ -251,7 +254,7 @@
 				495D4C7C17062E8800BCFCF4 /* WIRoute.m in Sources */,
 				495D4C8217064C2100BCFCF4 /* WIRouteBuilder.m in Sources */,
 				49EB915C1708687000D356E6 /* WIRoutePlaceholder.m in Sources */,
-				49193087171064B20031845A /* WIRouting.m in Sources */,
+				49193087171064B20031845A /* WIRouter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,6 +263,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				495D4C8817065C0C00BCFCF4 /* WIRouteBuilderTests.m in Sources */,
+				49322F0417611E5900308F4F /* WIRouterTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
