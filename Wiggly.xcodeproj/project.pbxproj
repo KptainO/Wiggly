@@ -47,6 +47,7 @@
 		49193085171064B20031845A /* WIRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouter.h; sourceTree = "<group>"; };
 		49193086171064B20031845A /* WIRouter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouter.m; sourceTree = "<group>"; };
 		49322F0317611E5900308F4F /* WIRouterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouterTests.m; sourceTree = "<group>"; };
+		49322F0517612DB400308F4F /* Wiggly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wiggly.h; sourceTree = "<group>"; };
 		495D4C4C17062E2B00BCFCF4 /* libWiggly.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libWiggly.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		495D4C4F17062E2B00BCFCF4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		495D4C5317062E2B00BCFCF4 /* Wiggly-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wiggly-Prefix.pch"; sourceTree = "<group>"; };
@@ -130,6 +131,7 @@
 				49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */,
 				49193085171064B20031845A /* WIRouter.h */,
 				49193086171064B20031845A /* WIRouter.m */,
+				49322F0517612DB400308F4F /* Wiggly.h */,
 			);
 			path = Wiggly;
 			sourceTree = "<group>";
