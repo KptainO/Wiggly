@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * Contain information about a route parameter
+ */
 @interface WIRoutePlaceholder : NSObject
 
 @property(nonatomic, copy, readonly)NSString    *name;
@@ -16,6 +19,12 @@
 
 - (id)initWithName:(NSString *)name;
 
+/**
+ * Check that value respect the conditions
+ *
+ * @param value the value to check conditions on
+ * @return YES if conditions are fulfilled, NO otherwise
+ */
 - (BOOL)matchConditions:(NSString *)value;
 
 @end
