@@ -12,7 +12,7 @@ Wiggly
 - Define requirements on each incoming/outgoing parameters
 - Build a collection of urls that you can easily reference (TODO)
 
-For more explanation, see the [wiki](/wiki)
+For more explanation, see the [wiki](wiki)
 
 ## Installation
 
