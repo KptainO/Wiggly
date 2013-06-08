@@ -18,6 +18,8 @@
 		495D4C7C17062E8800BCFCF4 /* WIRoute.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C7B17062E8800BCFCF4 /* WIRoute.m */; };
 		495D4C8217064C2100BCFCF4 /* WIRouteBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8117064C2100BCFCF4 /* WIRouteBuilder.m */; };
 		495D4C8817065C0C00BCFCF4 /* WIRouteBuilderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */; };
+		49D8E32B17636ACB00C5D50A /* WIRouterCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 49D8E32A17636ACB00C5D50A /* WIRouterCollection.m */; };
+		49D8E32E1763760F00C5D50A /* WIRouterCollectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 49D8E32D1763760F00C5D50A /* WIRouterCollectionTests.m */; };
 		49EB915C1708687000D356E6 /* WIRoutePlaceholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +63,9 @@
 		495D4C8017064C2100BCFCF4 /* WIRouteBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouteBuilder.h; sourceTree = "<group>"; };
 		495D4C8117064C2100BCFCF4 /* WIRouteBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteBuilder.m; sourceTree = "<group>"; };
 		495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteBuilderTests.m; sourceTree = "<group>"; };
+		49D8E32917636ACB00C5D50A /* WIRouterCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouterCollection.h; sourceTree = "<group>"; };
+		49D8E32A17636ACB00C5D50A /* WIRouterCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouterCollection.m; sourceTree = "<group>"; };
+		49D8E32D1763760F00C5D50A /* WIRouterCollectionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouterCollectionTests.m; sourceTree = "<group>"; };
 		49EB915A1708687000D356E6 /* WIRoutePlaceholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRoutePlaceholder.h; sourceTree = "<group>"; };
 		49EB915B1708687000D356E6 /* WIRoutePlaceholder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRoutePlaceholder.m; sourceTree = "<group>"; };
 		49FB75B217248D5E00B9A627 /* WIRoutable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WIRoutable.h; sourceTree = "<group>"; };
@@ -132,6 +137,8 @@
 				49193085171064B20031845A /* WIRouter.h */,
 				49193086171064B20031845A /* WIRouter.m */,
 				49322F0517612DB400308F4F /* Wiggly.h */,
+				49D8E32917636ACB00C5D50A /* WIRouterCollection.h */,
+				49D8E32A17636ACB00C5D50A /* WIRouterCollection.m */,
 			);
 			path = Wiggly;
 			sourceTree = "<group>";
@@ -142,6 +149,7 @@
 				495D4C6717062E2C00BCFCF4 /* Supporting Files */,
 				495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */,
 				49322F0317611E5900308F4F /* WIRouterTests.m */,
+				49D8E32D1763760F00C5D50A /* WIRouterCollectionTests.m */,
 			);
 			path = WigglyTests;
 			sourceTree = "<group>";
@@ -257,6 +265,7 @@
 				495D4C8217064C2100BCFCF4 /* WIRouteBuilder.m in Sources */,
 				49EB915C1708687000D356E6 /* WIRoutePlaceholder.m in Sources */,
 				49193087171064B20031845A /* WIRouter.m in Sources */,
+				49D8E32B17636ACB00C5D50A /* WIRouterCollection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,6 +275,7 @@
 			files = (
 				495D4C8817065C0C00BCFCF4 /* WIRouteBuilderTests.m in Sources */,
 				49322F0417611E5900308F4F /* WIRouterTests.m in Sources */,
+				49D8E32E1763760F00C5D50A /* WIRouterCollectionTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
