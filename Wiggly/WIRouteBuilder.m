@@ -9,7 +9,7 @@
 #import "WIRouteBuilder.h"
 
 #import "WIRoute.h"
-#import "WIRoutePlaceholder.h"
+#import "WIRouteParameter.h"
 
 NSString  *const kWIPathSubset = @"0-9a-z-._%";
 NSString  *const kWISubDelimiters = @";,*+$!)(";
@@ -65,7 +65,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   // Merge default values with those provided by user
   allValues = [NSMutableDictionary dictionaryWithCapacity:self.placeholders.count];
 
-  for (WIRoutePlaceholder *placeholder in self.placeholders)
+  for (WIRouteParameter *placeholder in self.placeholders)
     if (!shortVersion || placeholder.required)
       allValues[placeholder.name] = values[placeholder.name]
       ? [values[placeholder.name] description]
@@ -75,7 +75,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
     allValues.dictionary = [self.delegate builder:self willUseValues:allValues];
 
   // replace placeholders with their associated variable value
-  for (WIRoutePlaceholder *placeholder in self.placeholders)
+  for (WIRouteParameter *placeholder in self.placeholders)
   {
     NSString *marker = [self.markerDelegate builder:self markerForPlaceholder:placeholder];
     NSRange markerRange = [path rangeOfString:marker options:0 range:NSMakeRange(previousMarkerIdx, path.length - previousMarkerIdx)];
@@ -108,7 +108,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   if (!matches)
     return nil;
 
-  for (WIRoutePlaceholder *placeholder in self.placeholders) {
+  for (WIRouteParameter *placeholder in self.placeholders) {
     NSUInteger rangeIdx = [self.placeholdersMeta_[placeholder.name][kWIMetaMatchingCommaIdx] intValue];
     NSRange valueRange = [matches rangeAtIndex:rangeIdx];
 
@@ -134,7 +134,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   return marker;
 }
 
-- (NSString *)builder:(WIRouteBuilder *)builder markerForPlaceholder:(WIRoutePlaceholder *)placeholder {
+- (NSString *)builder:(WIRouteBuilder *)builder markerForPlaceholder:(WIRouteParameter *)placeholder {
   return [@":" stringByAppendingString:placeholder.name];
 }
 
@@ -179,7 +179,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
     NSString *prevStr = [self.route.path substringWithRange:
                                       NSMakeRange(prevStrIdx, matchRange.location - prevStrIdx)];
 
-    WIRoutePlaceholder *placeholder = [self _addRoutePlaceholder:variableName];
+    WIRouteParameter *placeholder = [self _addRouteParameter:variableName];
 
     [pattern appendString:prevStr];
 
@@ -246,7 +246,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
     // and update its metadata
     for (int i = [optSegment[@"placeholderIdx"] intValue]; i < self.placeholders.count; ++i)
     {
-      WIRoutePlaceholder *placeholder = self.placeholders[i];
+      WIRouteParameter *placeholder = self.placeholders[i];
 
       [placeholder setRequired:NO];
 
@@ -258,8 +258,8 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   self.regex = [NSString stringWithString:pattern];
 }
 
-- (WIRoutePlaceholder *)_addRoutePlaceholder:(NSString *)name {
-  WIRoutePlaceholder  *placeholder = [[WIRoutePlaceholder alloc] initWithName:name];
+- (WIRouteParameter *)_addRouteParameter:(NSString *)name {
+  WIRouteParameter  *placeholder = [[WIRouteParameter alloc] initWithName:name];
 
   if (self.route.requirements[name])
     placeholder.conditions = self.route.requirements[name];
@@ -277,7 +277,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   if (!self.shortPath_)
     return NO;
 
-  for (WIRoutePlaceholder *placeholder in self.placeholders)
+  for (WIRouteParameter *placeholder in self.placeholders)
   {
     NSString *value = [values[placeholder.name] description];
 

@@ -9,4 +9,4 @@
 #import <Wiggly/WIRouter.h>
 #import <Wiggly/WIRoute.h>
 #import <Wiggly/WIRouteBuilder.h>
-#import <Wiggly/WIRoutePlaceholder.h>
+#import <Wiggly/WIRouteParameter.h>

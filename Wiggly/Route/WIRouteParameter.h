@@ -11,7 +11,7 @@
 /**
  * Contain information about a route parameter
  */
-@interface WIRoutePlaceholder : NSObject
+@interface WIRouteParameter : NSObject
 
 @property(nonatomic, copy, readonly)NSString    *name;
 @property(nonatomic, strong)NSString            *conditions;

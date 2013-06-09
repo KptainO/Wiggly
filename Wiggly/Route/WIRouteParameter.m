@@ -6,13 +6,13 @@
 // file that was distributed with this source code.
 //
 
-#import "WIRoutePlaceholder.h"
+#import "WIRouteParameter.h"
 
-@interface WIRoutePlaceholder ()
+@interface WIRouteParameter ()
 @property(nonatomic, copy)NSString  *name;
 @end
 
-@implementation WIRoutePlaceholder
+@implementation WIRouteParameter
 
 #pragma mark -
 #pragma mark Initialization

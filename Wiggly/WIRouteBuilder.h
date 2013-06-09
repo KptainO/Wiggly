@@ -12,12 +12,12 @@
 
 @class WIRoute;
 @class WIRouteBuilder;
-@class WIRoutePlaceholder;
+@class WIRouteParameter;
 
 @protocol WIRouteBuilderMarkerDelegate <NSObject>
 
 - (NSString *)builderMarkerRegex:(WIRouteBuilder *)builder;
-- (NSString *)builder:(WIRouteBuilder *)builder markerForPlaceholder:(WIRoutePlaceholder *)placeholder;
+- (NSString *)builder:(WIRouteBuilder *)builder markerForPlaceholder:(WIRouteParameter *)placeholder;
 
 @end
 

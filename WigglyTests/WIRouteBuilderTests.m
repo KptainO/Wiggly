@@ -9,7 +9,7 @@
 
 #import "WIRoute.h"
 #import "WIRouteBuilder.h"
-#import "WIRoutePlaceholder.h"
+#import "WIRouteParameter.h"
 
 @interface WIRouteBuilderTests : SenTestCase
 @end
@@ -99,7 +99,7 @@
                                     requirements:nil
                                         defaults:@{@"page": @1, @"id": @1}];
 
-  STAssertTrue(((WIRoutePlaceholder *)builder.placeholders[0]).required, nil);
+  STAssertTrue(((WIRouteParameter *)builder.placeholders[0]).required, nil);
 }
 
 - (void)testPlaceholdersAllSetAsRequired {
@@ -107,7 +107,7 @@
                                     requirements:nil
                                         defaults:@{@"page": @1, @"id": @1}];
 
-  for (WIRoutePlaceholder *holder in builder.placeholders)
+  for (WIRouteParameter *holder in builder.placeholders)
     STAssertTrue(holder.required, @"'%@' holder is not set to required", holder.name);
 }
 
