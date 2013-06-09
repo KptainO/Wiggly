@@ -10,6 +10,7 @@
 
 #import "WIRouter.h"
 #import "WIRoute.h"
+#import "WIRouterCollectionLockedNameException.h"
 
 @interface WIRouterCollection () {
   NSMutableDictionary *routes_;
@@ -50,7 +51,7 @@
 
 - (void)add:(NSString *)routeName router:(WIRouter *)router {
   if (self.routes[routeName])
-    return; // @TODO: throw exception
+    @throw [WIRouterCollectionLockedNameException exceptionWithCollection:self routeName:routeName];
   
   routes_[routeName] = router;
   [self.routesOrder_ addObject:routeName];

@@ -44,7 +44,7 @@
 - (NSString *)route:(id)object {
   NSDictionary *values = (NSDictionary *)object;
 
-  if (![values isKindOfClass:[NSDictionary class]])
+  if (values && ![values isKindOfClass:[NSDictionary class]])
   {
     NSString *msg = [NSString stringWithFormat:@"Route %@ can't route an object ", self.builder_.path];
     @throw [NSException exceptionWithName:@"Invalid argument" reason:msg userInfo:nil];

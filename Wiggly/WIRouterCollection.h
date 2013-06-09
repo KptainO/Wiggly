@@ -30,7 +30,7 @@
  * @param routeName router unique identifier
  * @param router
  *
- * @throw WIRouterNameAlreadyExistException if routerName is already present
+ * @throw WIRouterCollectionLockedNameException if routerName is already present
  */
 - (void)add:(NSString *)routeName router:(WIRouter *)router;
 
@@ -40,7 +40,7 @@
  * Import all routes from collection inside current one
  *
  * @param collection the collection to import routes from
- * @throw WIRouterNameAlreadyExistException if any collection router has a name already present
+ * @throw WIRouterCollectionLockedNameException if any collection router has a name already present
  */
 - (void)add:(WIRouterCollection *)collection;
 
