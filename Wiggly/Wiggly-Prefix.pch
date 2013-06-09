@@ -4,4 +4,10 @@
 
 #ifdef __OBJC__
   #import <Foundation/Foundation.h>
+
+  #ifndef CtorNotInherited
+    #define CtorNotInherited \
+      [NSException raise:@"InvalidCtor" format:@"Constructor not inherited"];\
+      return nil;
+  #endif
 #endif

@@ -11,6 +11,7 @@
 #import "WIRouterCollection.h"
 #import "WIRouter.h"
 #import "WIRoute.h"
+#import "WIRouterCollectionLockedNameException.h"
 
 @interface WIRouterCollectionTests : SenTestCase
 @property(nonatomic, strong)WIRouterCollection  *collection;
@@ -40,7 +41,7 @@
 
 - (void)testAddRouteException {
   [self.collection add:@"root" router:self.root];
-  STAssertThrows([self.collection add:@"root" router:self.root], nil);
+  STAssertThrowsSpecific([self.collection add:@"root" router:self.root], WIRouterCollectionLockedNameException, nil);
 }
 
 - (void)testAddRouteCollection {
@@ -61,7 +62,7 @@
   [self.collection add:@"root" router:self.root];
   
   [collection add:@"root" router:self.root];
-  STAssertThrows([self.collection add:collection], nil);
+  STAssertThrowsSpecific([self.collection add:collection], WIRouterCollectionLockedNameException, nil);
 }
 
 - (void)testRoute {
