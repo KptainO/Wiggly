@@ -12,10 +12,13 @@
 @class WIRoute;
 
 /**
- * Collection which allow you to handle multiple WIRouter objects at a time.
- * Each router will have a name that you reference to when using route:with: method.
+ * Collection which allow you to handle multiple WIRouter objects at a time by giving them a name.
+ * The order in which you add the routers are their priority order, meaning that if multiple routes would be able to
+ * match a same path, only the 1st one will really.
+ *
+ * The NSFastEnumeration implementation allow to iterate through each router in their insertion order
  */
-@interface WIRouterCollection : NSObject
+@interface WIRouterCollection : NSObject<NSFastEnumeration>
 
 @property(nonatomic, strong, readonly)NSDictionary    *routes;
 
@@ -52,5 +55,12 @@
 - (NSString *)route:(NSString *)routeName with:(id)object;
 
 - (id)match:(NSString *)path;
+
+/**
+ * Enumerate all route names in their inserted/priority orders
+ *
+ * @see NSFastEnumeration
+ */
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len;
 
 @end
