@@ -131,6 +131,15 @@
   STAssertNil([builder match:@"/blog/foo"], nil);
 }
 
+- (void)testMatchComplexRequirement {
+  WIRouteBuilder *builder = [self _routeRegex:@"/photos/:id"
+                                 requirements:@{@"id": @"[A-Z]\\d{5}"}
+                                     defaults:nil];
+  
+  STAssertEqualObjects([builder match:@"/photos/A12345"], @{@"id": @"A12345"}, nil);
+  STAssertEqualObjects([builder match:@"/photos/A123"], nil, nil);
+}
+
 - (void)testMatchOptionalSegment {
   WIRouteBuilder *builder = [self _routeRegex:@"/blog/:page/:show/:id"
                                  requirements:nil
