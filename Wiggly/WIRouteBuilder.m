@@ -13,7 +13,6 @@
 
 NSString  *const kWIPathSubset = @"0-9a-z-._%";
 NSString  *const kWISubDelimiters = @";,*+$!)(";
-NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
 
 #define kWIPlaceholderRegex   [kWIPathSubset stringByAppendingString:kWISubDelimiters]
 #define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
@@ -26,8 +25,6 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
 @property(nonatomic, strong)NSString        *longPath_;
 @property(nonatomic, strong)NSString        *shortPath_;
 @property(nonatomic, strong)NSMutableArray  *placeholders_;
-/// Meta/additional data about placeholders that should stay private/protected
-@property(nonatomic, strong)NSMutableDictionary *placeholdersMeta_;
 
 - (void)_build;
 
@@ -104,14 +101,15 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
   NSTextCheckingResult *matches = [regex firstMatchInString:pattern options:0 range:NSMakeRange(0, pattern.length)];
   NSMutableDictionary *values = [NSMutableDictionary dictionary];
   NSMutableDictionary *allValues = nil;
-
+  int i = 0;
+  
   if (!matches)
     return nil;
 
   for (WIRouteParameter *placeholder in self.placeholders) {
-    NSUInteger rangeIdx = [self.placeholdersMeta_[placeholder.name][kWIMetaMatchingCommaIdx] intValue];
+    NSUInteger rangeIdx = ++i + (placeholder.required ? 0 : 1);
     NSRange valueRange = [matches rangeAtIndex:rangeIdx];
-
+    
     if (valueRange.location != NSNotFound)
       values[placeholder.name] = [pattern substringWithRange:valueRange];
   }
@@ -157,8 +155,6 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
 #pragma mark Protected Methods
 
 - (void)_build {
-  // track how many capture comma we have so far inside the generated regex
-  NSUInteger numberOfCommaGroups = 0;
   NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
   NSUInteger prevStrIdx = 0;
   NSDictionary *optSegment = nil;
@@ -199,12 +195,6 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
       };
 
     [pattern appendString:[NSString stringWithFormat:@"(%@)", placeholder.conditions]];
-
-    self.placeholdersMeta_[placeholder.name] = [NSMutableDictionary dictionaryWithDictionary:@{
-    kWIMetaMatchingCommaIdx : @(1 + numberOfCommaGroups)
-    }];
-
-    numberOfCommaGroups += 1 + [NSRegularExpression regularExpressionWithPattern:placeholder.conditions options:0 error:nil].numberOfCaptureGroups;
 
     prevStrIdx = matchRange.location + matchRange.length;
   }
@@ -249,9 +239,6 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
       WIRouteParameter *placeholder = self.placeholders[i];
 
       [placeholder setRequired:NO];
-
-      // Add 1 to matching comma index to reflect the (optional segment) comma which has been added
-      self.placeholdersMeta_[placeholder.name][kWIMetaMatchingCommaIdx] = @2;//@([self.placeholdersMeta_[placeholder.name][kWIMetaMatchingCommaIdx] intValue] + 1);
     }
   }
 
@@ -265,7 +252,7 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
     placeholder.conditions = self.route.requirements[name];
   else
     placeholder.conditions = [NSString stringWithFormat:@"[%@]+", kWIPlaceholderRegex];
-
+  
   [self.placeholders_ addObject:placeholder];
 
   return placeholder;
@@ -297,7 +284,6 @@ NSString  *const kWIMetaMatchingCommaIdx = @"matchingCommaIdx";
     _route = route;
 
     self.placeholders_ = [NSMutableArray array];
-    self.placeholdersMeta_ = [NSMutableDictionary dictionary];
     self.shortPath_ = nil;
     
     [self _build];
