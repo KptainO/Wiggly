@@ -18,6 +18,8 @@
  */
 @interface WIRouter : NSObject
 
+@property(nonatomic, strong)WIRoute *route;
+
 - (id)initWithRoute:(WIRoute *)route;
 - (id)initWithRoute:(WIRoute *)route builder:(Class)builder;
 

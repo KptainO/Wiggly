@@ -29,7 +29,6 @@
 /**
  * **Regex** rules that each path parameter must respect to be matchable
  * Note that paremeter names must not include leading semicolon character!
- * @deprecated removed in 0.5.0
  *
  * Example:
  * \code
@@ -51,6 +50,16 @@
  */
 - (id)initWithPath:(NSString *)path;
 
+/**
+ * Add constraints to the route
+ * 
+ * The way the constraint attribute is managed depends on it type:
+ * - An array or dictionary only add new possibilites for the same route attribute
+ * - A string attribute override the route attribute value
+ *
+ * Some exceptions though:
+ * - constraint path is treated as a prefix path for the route path instead of overriding it at all
+ */
 - (void)merge:(id<WIRouteConstraintURL>)constraint;
 
 @end

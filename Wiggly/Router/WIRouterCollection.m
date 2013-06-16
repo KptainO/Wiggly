@@ -11,13 +11,16 @@
 #import "WIRouter.h"
 #import "WIRoute.h"
 #import "WIRouterCollectionLockedNameException.h"
+#import "WIRouteConstraintURL.h"
 
 @interface WIRouterCollection () {
   NSMutableDictionary *routes_;
 }
 
-@property(nonatomic, strong)NSMutableArray  *routesOrder_;
-@property(nonatomic, strong)NSDictionary    *routes;
+@property(nonatomic, strong)NSDictionary          *routes;
+
+@property(nonatomic, strong)NSMutableArray        *routesOrder_;
+@property(nonatomic, strong)WIRouteConstraintURL  *constraint_;
 
 @end
 
@@ -32,12 +35,21 @@
   return [[[self class] alloc] init];
 }
 
++ (id)collectionWithConstraint:(WIRouteConstraintURL *)constraint {
+  return [[[self class] alloc] initWithConstraint:constraint];
+}
+
 - (id)init {
+  return [self initWithConstraint:nil];
+}
+
+- (id)initWithConstraint:(WIRouteConstraintURL *)constraint {
   if (!(self = [super init]))
     return nil;
   
   self.routesOrder_ = [NSMutableArray array];
   self.routes = [NSMutableDictionary dictionary];
+  self.constraint_ = constraint;
   
   return self;
 }
@@ -52,6 +64,8 @@
 - (void)add:(NSString *)routeName router:(WIRouter *)router {
   if (self.routes[routeName])
     @throw [WIRouterCollectionLockedNameException exceptionWithCollection:self routeName:routeName];
+  
+  [router.route merge:self.constraint_];
   
   routes_[routeName] = router;
   [self.routesOrder_ addObject:routeName];
