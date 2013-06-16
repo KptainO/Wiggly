@@ -35,4 +35,10 @@
   STAssertEqualObjects(self.route.path, @"/prefix/root", nil);
 }
 
+- (void)testMergeNil {
+  [self.route merge:nil];
+  
+  STAssertEqualObjects(self.route.path, @"/root", nil);
+}
+
 @end
