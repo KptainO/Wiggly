@@ -17,6 +17,8 @@
 		495D4C8217064C2100BCFCF4 /* WIRouteBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8117064C2100BCFCF4 /* WIRouteBuilder.m */; };
 		495D4C8817065C0C00BCFCF4 /* WIRouteBuilderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */; };
 		49751CF617651D1E00BB66F4 /* WIRouteParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = 49751CF517651D1E00BB66F4 /* WIRouteParameter.m */; };
+		49BB6238176A7D7100B042BE /* WIRouteConstraintURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 49D433ED1767C1DD007FB1BE /* WIRouteConstraintURL.m */; };
+		49C126C0176E518700898D35 /* WIRouteTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 49C126BF176E518700898D35 /* WIRouteTests.m */; };
 		49D8E32E1763760F00C5D50A /* WIRouterCollectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 49D8E32D1763760F00C5D50A /* WIRouterCollectionTests.m */; };
 		49D9FF431764BA110081260E /* WIRouterCollectionLockedNameException.m in Sources */ = {isa = PBXBuildFile; fileRef = 49D9FF421764BA110081260E /* WIRouterCollectionLockedNameException.m */; };
 		49D9FF471764BDE80081260E /* WIRoute.m in Sources */ = {isa = PBXBuildFile; fileRef = 49D9FF461764BDE80081260E /* WIRoute.m */; };
@@ -62,6 +64,9 @@
 		495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteBuilderTests.m; sourceTree = "<group>"; };
 		49751CF417651D1E00BB66F4 /* WIRouteParameter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouteParameter.h; sourceTree = "<group>"; };
 		49751CF517651D1E00BB66F4 /* WIRouteParameter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteParameter.m; sourceTree = "<group>"; };
+		49C126BF176E518700898D35 /* WIRouteTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouteTests.m; sourceTree = "<group>"; };
+		49D0A800176687FA00915E83 /* WIRouteConstraintURL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WIRouteConstraintURL.h; sourceTree = "<group>"; };
+		49D433ED1767C1DD007FB1BE /* WIRouteConstraintURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WIRouteConstraintURL.m; sourceTree = "<group>"; };
 		49D8E32D1763760F00C5D50A /* WIRouterCollectionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouterCollectionTests.m; sourceTree = "<group>"; };
 		49D9FF411764BA110081260E /* WIRouterCollectionLockedNameException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WIRouterCollectionLockedNameException.h; sourceTree = "<group>"; };
 		49D9FF421764BA110081260E /* WIRouterCollectionLockedNameException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WIRouterCollectionLockedNameException.m; sourceTree = "<group>"; };
@@ -143,6 +148,7 @@
 		495D4C6617062E2C00BCFCF4 /* WigglyTests */ = {
 			isa = PBXGroup;
 			children = (
+				49C126BD176E517600898D35 /* Route */,
 				495D4C6717062E2C00BCFCF4 /* Supporting Files */,
 				495D4C8717065C0C00BCFCF4 /* WIRouteBuilderTests.m */,
 				49322F0317611E5900308F4F /* WIRouterTests.m */,
@@ -158,6 +164,14 @@
 				495D4C6917062E2C00BCFCF4 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		49C126BD176E517600898D35 /* Route */ = {
+			isa = PBXGroup;
+			children = (
+				49C126BF176E518700898D35 /* WIRouteTests.m */,
+			);
+			path = Route;
 			sourceTree = "<group>";
 		};
 		49D9FF3D1764B1600081260E /* Router */ = {
@@ -180,6 +194,8 @@
 				49751CF517651D1E00BB66F4 /* WIRouteParameter.m */,
 				49D9FF451764BDE80081260E /* WIRoute.h */,
 				49D9FF461764BDE80081260E /* WIRoute.m */,
+				49D0A800176687FA00915E83 /* WIRouteConstraintURL.h */,
+				49D433ED1767C1DD007FB1BE /* WIRouteConstraintURL.m */,
 			);
 			path = Route;
 			sourceTree = "<group>";
@@ -288,6 +304,7 @@
 				49D9FF4C1764BDFD0081260E /* WIRouter.m in Sources */,
 				49D9FF4D1764BDFD0081260E /* WIRouterCollection.m in Sources */,
 				49751CF617651D1E00BB66F4 /* WIRouteParameter.m in Sources */,
+				49BB6238176A7D7100B042BE /* WIRouteConstraintURL.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,6 +315,7 @@
 				495D4C8817065C0C00BCFCF4 /* WIRouteBuilderTests.m in Sources */,
 				49322F0417611E5900308F4F /* WIRouterTests.m in Sources */,
 				49D8E32E1763760F00C5D50A /* WIRouterCollectionTests.m in Sources */,
+				49C126C0176E518700898D35 /* WIRouteTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
