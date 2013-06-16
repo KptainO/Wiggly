@@ -8,6 +8,8 @@
 
 #import "WIRoute.h"
 
+#import "WIRouteConstraintURL.h"
+
 @interface WIRoute ()
 @property(nonatomic, strong)NSString            *path;
 @property(nonatomic, strong)NSMutableDictionary *requirements;
@@ -37,6 +39,14 @@
 - (id)init {
   @throw [NSException exceptionWithName:@"Invalid Ctor" reason:nil userInfo:nil];
   return nil;
+}
+
+- (void)merge:(id<WIRouteConstraintURL>)constraint {
+  if (!constraint)
+    return;
+  
+  if (constraint.path)
+    self.path  = [constraint.path stringByAppendingPathComponent:self.path];
 }
 
 @end

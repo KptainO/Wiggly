@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "WIRoutable.h"
+#import "WIRouteConstraintURL.h"
 
 /**
  * Container object which hold all information about a route.
@@ -20,7 +20,7 @@
  * You can then change/get its value when generating/getting the URL path. @see WIRouter class for more
  * information about routing mechanism
  */
-@interface WIRoute : NSObject<WIRoutable>
+@interface WIRoute : NSObject<WIRouteConstraintURL>
 
 /// route path
 /// example: \code @"/say/:hello/world" \endcode
@@ -29,7 +29,8 @@
 /**
  * **Regex** rules that each path parameter must respect to be matchable
  * Note that paremeter names must not include leading semicolon character!
- 
+ * @deprecated removed in 0.5.0
+ *
  * Example:
  * \code
  * @{ @"hello": @"\\d+" } // meaning :hello parameter must must only 1+ digits
@@ -49,5 +50,7 @@
  * @param path the route path
  */
 - (id)initWithPath:(NSString *)path;
+
+- (void)merge:(id<WIRouteConstraintURL>)constraint;
 
 @end
