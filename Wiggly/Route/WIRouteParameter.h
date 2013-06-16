@@ -15,7 +15,7 @@
 
 @property(nonatomic, copy, readonly)NSString    *name;
 @property(nonatomic, strong)NSString            *conditions;
-@property(nonatomic)BOOL                        required;
+@property(nonatomic, strong)id                  defaults;
 
 - (id)initWithName:(NSString *)name;
 

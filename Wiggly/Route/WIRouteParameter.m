@@ -22,7 +22,6 @@
     return nil;
 
   self.name = name;
-  self.required = YES;
 
   return self;
 }

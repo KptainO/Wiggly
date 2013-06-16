@@ -10,11 +10,8 @@
 
 #import "WIRoute.h"
 #import "WIRouteParameter.h"
+#import "WIRegexSegment.h"
 
-NSString  *const kWIPathSubset = @"0-9a-z-._%";
-NSString  *const kWISubDelimiters = @";,*+$!)(";
-
-#define kWIPlaceholderRegex   [kWIPathSubset stringByAppendingString:kWISubDelimiters]
 #define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
 
 @interface WIRouteBuilder ()
@@ -24,7 +21,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 @property(nonatomic, strong)WIRoute         *route;
 @property(nonatomic, strong)NSString        *longPath_;
 @property(nonatomic, strong)NSString        *shortPath_;
-@property(nonatomic, strong)NSMutableArray  *placeholders_;
+@property(nonatomic, strong)NSMutableArray  *segments_;
 
 - (void)_build;
 
@@ -60,36 +57,36 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   path.string = shortVersion ? self.shortPath_ : self.longPath_;
 
   // Merge default values with those provided by user
-  allValues = [NSMutableDictionary dictionaryWithCapacity:self.placeholders.count];
+  allValues = [NSMutableDictionary dictionaryWithCapacity:self.segments.count];
 
-  for (WIRouteParameter *placeholder in self.placeholders)
-    if (!shortVersion || placeholder.required)
-      allValues[placeholder.name] = values[placeholder.name]
-      ? [values[placeholder.name] description]
-      : [self.defaults[placeholder.name] description];
+  for (WIRegexSegment *segment in self.segments)
+    if (!shortVersion || segment.required)
+      allValues[segment.name] = values[segment.name]
+      ? [values[segment.name] description]
+      : [segment.defaults description];
 
   if (self.delegate)
     allValues.dictionary = [self.delegate builder:self willUseValues:allValues];
 
-  // replace placeholders with their associated variable value
-  for (WIRouteParameter *placeholder in self.placeholders)
+  // replace segments with their associated variable value
+  for (WIRegexSegment *segment in self.segments)
   {
-    NSString *marker = [self.markerDelegate builder:self markerForPlaceholder:placeholder];
+    NSString *marker = [self.markerDelegate builder:self markerForPlaceholder:segment];
     NSRange markerRange = [path rangeOfString:marker options:0 range:NSMakeRange(previousMarkerIdx, path.length - previousMarkerIdx)];
 
     if (markerRange.location == NSNotFound)
       continue;
 
-    // variable does not fulfill placeholder conditions
-    if (![placeholder matchConditions:allValues[placeholder.name]])
+    // variable does not fulfill segment conditions
+    if (![segment matchConditions:allValues[segment.name]])
       @throw [NSException exceptionWithName:@"" reason:@"" userInfo:nil];
 
     [path replaceOccurrencesOfString:marker
-                          withString:allValues[placeholder.name]
+                          withString:allValues[segment.name]
                              options:0
                                range:markerRange];
 
-    // Optimization: search next placeholder after the one we've just replaced
+    // Optimization: search next segment after the one we've just replaced
     previousMarkerIdx = markerRange.location;
   }
 
@@ -101,23 +98,22 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   NSTextCheckingResult *matches = [regex firstMatchInString:pattern options:0 range:NSMakeRange(0, pattern.length)];
   NSMutableDictionary *values = [NSMutableDictionary dictionary];
   NSMutableDictionary *allValues = nil;
-  int i = 0;
   
   if (!matches)
     return nil;
 
-  for (WIRouteParameter *placeholder in self.placeholders) {
-    NSUInteger rangeIdx = ++i + (placeholder.required ? 0 : 1);
-    NSRange valueRange = [matches rangeAtIndex:rangeIdx];
+  for (WIRegexSegment *segment in self.segments) {
+    NSUInteger matchingRangeIdx = segment.order + 1 + (segment.required ? 0 : 1);
+    NSRange valueRange = [matches rangeAtIndex:matchingRangeIdx];
     
     if (valueRange.location != NSNotFound)
-      values[placeholder.name] = [pattern substringWithRange:valueRange];
+      values[segment.name] = [pattern substringWithRange:valueRange];
   }
 
   if (self.delegate)
     values.dictionary = [self.delegate builder:self didReceivedValues:values];
 
-  allValues = [NSMutableDictionary dictionaryWithDictionary:self.defaults];
+  allValues = [NSMutableDictionary dictionaryWithDictionary:self.route.defaults];
   [allValues addEntriesFromDictionary:values];
   
   return allValues;
@@ -132,8 +128,8 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   return marker;
 }
 
-- (NSString *)builder:(WIRouteBuilder *)builder markerForPlaceholder:(WIRouteParameter *)placeholder {
-  return [@":" stringByAppendingString:placeholder.name];
+- (NSString *)builder:(WIRouteBuilder *)builder markerForPlaceholder:(WIRouteParameter *)segment {
+  return [@":" stringByAppendingString:segment.name];
 }
 
 #pragma mark -
@@ -141,10 +137,6 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 
 - (NSString *)path {
   return self.longPath_;
-}
-
-- (NSDictionary *)defaults {
-  return self.route.defaults;
 }
 
 - (NSString *)longPath_ {
@@ -162,45 +154,45 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:marker
                                                                          options:NSRegularExpressionCaseInsensitive
                                                                            error:nil];
-  NSArray *placeholders = [regex matchesInString:self.route.path
+  NSArray *segments = [regex matchesInString:self.route.path
                                          options:NSMatchingReportCompletion
                                            range:NSMakeRange(0, self.route.path.length)];
 
 
-  for (NSTextCheckingResult *placeholderMatch in placeholders)
+  for (NSTextCheckingResult *segmentMatch in segments)
   {
-    NSRange matchRange = [placeholderMatch range];
-    NSRange placeholderRange = [placeholderMatch rangeAtIndex:2];
-    NSString *variableName = [self.route.path substringWithRange:placeholderRange];
+    NSRange matchRange = [segmentMatch range];
+    NSRange segmentRange = [segmentMatch rangeAtIndex:2];
+    NSString *variableName = [self.route.path substringWithRange:segmentRange];
     NSString *prevStr = [self.route.path substringWithRange:
                                       NSMakeRange(prevStrIdx, matchRange.location - prevStrIdx)];
 
-    WIRouteParameter *placeholder = [self _addRouteParameter:variableName];
+    WIRegexSegment *segment = [self _addSegment:variableName];
 
     [pattern appendString:prevStr];
 
-    // If there is a static text before the placeholder whose not a separator, then
+    // If there is a static text before the segment whose not a separator, then
     // we reset regexOptSegIdx value
     if (prevStr.length > 1 || [prevStr rangeOfCharacterFromSet:kWISeparatorSet].location == NSNotFound)
       optSegment = nil;
     
     // Try to determine if first optional segment
     // Optional part is obviously at the current end of building patten
-    // and at placeholder position inside path
+    // and at segment position inside path
     if (self.route.defaults[variableName] && !optSegment)
       optSegment = @{
         @"regexIdx": @(pattern.length),
-        @"pathIdx": @([placeholderMatch rangeAtIndex:1].location),
-        @"placeholderIdx": @(self.placeholders.count - 1)
+        @"pathIdx": @([segmentMatch rangeAtIndex:1].location),
+        @"segmentIdx": @(self.segments.count - 1)
       };
 
-    [pattern appendString:[NSString stringWithFormat:@"(%@)", placeholder.conditions]];
+    [pattern appendString:[NSString stringWithFormat:@"(%@)", segment.conditions]];
 
     prevStrIdx = matchRange.location + matchRange.length;
   }
 
-  // Append any missing part from path (after the last found placeholder)
-  // which also means that there is no placeholder which can be optional
+  // Append any missing part from path (after the last found segment)
+  // which also means that there is no segment which can be optional
   if (prevStrIdx <= (self.route.path.length - 1))
   {
     [pattern appendString:[self.route.path substringFromIndex:prevStrIdx]];
@@ -210,7 +202,7 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
 
   /**
    * There is an optional segment this means that:
-   * - some placeholders are in fact optional, so mark them as
+   * - some segments are in fact optional, so mark them as
    * - we can generate a shorter path
    * - regex will contain an optional matching segment
    */
@@ -232,30 +224,29 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
     [pattern insertString:@"(" atIndex:regexOptSegIdx];
     [pattern appendString:@")?"];
 
-    // Set every placeholder which is in the optional segment as optional
+    // Set every segment which is in the optional segment as optional
     // and update its metadata
-    for (int i = [optSegment[@"placeholderIdx"] intValue]; i < self.placeholders.count; ++i)
+    for (int i = [optSegment[@"segmentIdx"] intValue]; i < self.segments.count; ++i)
     {
-      WIRouteParameter *placeholder = self.placeholders[i];
+      WIRegexSegment *segment = self.segments[i];
 
-      [placeholder setRequired:NO];
+      [segment setRequired:NO];
     }
   }
 
   self.regex = [NSString stringWithString:pattern];
 }
 
-- (WIRouteParameter *)_addRouteParameter:(NSString *)name {
-  WIRouteParameter  *placeholder = [[WIRouteParameter alloc] initWithName:name];
+- (WIRegexSegment *)_addSegment:(NSString *)name {
+  WIRegexSegment  *segment = [[WIRegexSegment alloc] initWithName:name];
 
-  if (self.route.requirements[name])
-    placeholder.conditions = self.route.requirements[name];
-  else
-    placeholder.conditions = [NSString stringWithFormat:@"[%@]+", kWIPlaceholderRegex];
+  segment.defaults = self.route.defaults[name];
+  segment.conditions = self.route.requirements[name];
+  segment.order = self.segments_.count;
   
-  [self.placeholders_ addObject:placeholder];
+  [self.segments_ addObject:segment];
 
-  return placeholder;
+  return segment;
 }
 
 - (BOOL)_shouldGenerateShortPathWithValues:(NSDictionary *)values {
@@ -264,11 +255,11 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   if (!self.shortPath_)
     return NO;
 
-  for (WIRouteParameter *placeholder in self.placeholders)
+  for (WIRegexSegment *segment in self.segments)
   {
-    NSString *value = [values[placeholder.name] description];
+    NSString *value = [values[segment.name] description];
 
-    if (!placeholder.required && value && ![value isEqualToString:[self.defaults[placeholder.name] description]])
+    if (!segment.required && value && ![value isEqualToString:[segment.defaults description]])
     {
       useShortPath = NO;
       break;
@@ -283,15 +274,15 @@ NSString  *const kWISubDelimiters = @";,*+$!)(";
   {
     _route = route;
 
-    self.placeholders_ = [NSMutableArray array];
+    self.segments_ = [NSMutableArray array];
     self.shortPath_ = nil;
     
     [self _build];
   }
 }
 
-- (NSArray *)placeholders {
-  return self.placeholders_;
+- (NSArray *)segments {
+  return self.segments_;
 }
 
 @end

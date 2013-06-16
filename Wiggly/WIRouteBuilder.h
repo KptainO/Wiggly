@@ -27,11 +27,9 @@
 
 @end
 
-@interface WIRouteBuilder : NSObject<WIRoutable, WIRouteBuilderMarkerDelegate>
-@property(nonatomic, strong, readonly)NSArray               *placeholders;
-@property(nonatomic, strong, readonly)NSDictionary          *requirements;
+@interface WIRouteBuilder : NSObject<WIRouteBuilderMarkerDelegate>
+@property(nonatomic, strong, readonly)NSArray               *segments;
 @property(nonatomic, strong, readonly)NSString              *path;
-@property(nonatomic, strong, readonly)NSDictionary          *defaults;
 
 @property(nonatomic, strong, readonly)NSString              *regex;
 @property(nonatomic, weak)id<WIRouteBuilderMarkerDelegate>  markerDelegate;
