@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "WIRoutable.h"
+#import "WIRouteConstraintURL.h"
 
 /**
  * Container object which hold all information about a route.
@@ -20,7 +20,7 @@
  * You can then change/get its value when generating/getting the URL path. @see WIRouter class for more
  * information about routing mechanism
  */
-@interface WIRoute : NSObject<WIRoutable>
+@interface WIRoute : NSObject<WIRouteConstraintURL>
 
 /// route path
 /// example: \code @"/say/:hello/world" \endcode
@@ -29,7 +29,7 @@
 /**
  * **Regex** rules that each path parameter must respect to be matchable
  * Note that paremeter names must not include leading semicolon character!
- 
+ *
  * Example:
  * \code
  * @{ @"hello": @"\\d+" } // meaning :hello parameter must must only 1+ digits
@@ -49,5 +49,17 @@
  * @param path the route path
  */
 - (id)initWithPath:(NSString *)path;
+
+/**
+ * Add constraints to the route
+ * 
+ * The way the constraint attribute is managed depends on it type:
+ * - An array or dictionary only add new possibilites for the same route attribute
+ * - A string attribute override the route attribute value
+ *
+ * Some exceptions though:
+ * - constraint path is treated as a prefix path for the route path instead of overriding it at all
+ */
+- (void)merge:(id<WIRouteConstraintURL>)constraint;
 
 @end

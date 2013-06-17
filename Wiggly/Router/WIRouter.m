@@ -12,7 +12,6 @@
 #import "WIRouteBuilder.h"
 
 @interface WIRouter ()
-@property(nonatomic, strong)WIRoute         *route_;
 @property(nonatomic, strong)WIRouteBuilder  *builder_;
 @property(nonatomic, assign)Class           builderClass_;
 @end
@@ -32,7 +31,7 @@
   if (!(self = [super init]))
     return nil;
 
-  self.route_ = route;
+  self.route = route;
   self.builderClass_ = builder;
 
   return self;
@@ -60,7 +59,7 @@
 
 - (WIRouteBuilder *)builder_ {
   if (!builder_)
-    self.builder_ = [[self.builderClass_ alloc] initWithRoute:self.route_];
+    self.builder_ = [[self.builderClass_ alloc] initWithRoute:self.route];
 
   return builder_;
 }

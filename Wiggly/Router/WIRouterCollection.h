@@ -10,6 +10,7 @@
 
 @class WIRouter;
 @class WIRoute;
+@class WIRouteConstraintURL;
 
 /**
  * Collection which allow you to handle multiple WIRouter objects at a time by giving them a name.
@@ -23,6 +24,7 @@
 @property(nonatomic, strong, readonly)NSDictionary    *routes;
 
 + (id)collection;
++ (id)collectionWithConstraint:(WIRouteConstraintURL *)constraint;
 
 /**
  * Add a router to collection
