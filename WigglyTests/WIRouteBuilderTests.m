@@ -9,7 +9,7 @@
 
 #import "WIRoute.h"
 #import "WIRouteBuilder.h"
-#import "WIRouteParameter.h"
+#import "WIRegexSegment.h"
 
 @interface WIRouteBuilderTests : SenTestCase
 @end
@@ -99,7 +99,7 @@
                                     requirements:nil
                                         defaults:@{@"page": @1, @"id": @1}];
 
-  STAssertTrue(((WIRouteParameter *)builder.placeholders[0]).required, nil);
+  STAssertTrue(((WIRegexSegment *)builder.segments[0]).required, nil);
 }
 
 - (void)testPlaceholdersAllSetAsRequired {
@@ -107,7 +107,7 @@
                                     requirements:nil
                                         defaults:@{@"page": @1, @"id": @1}];
 
-  for (WIRouteParameter *holder in builder.placeholders)
+  for (WIRegexSegment *holder in builder.segments)
     STAssertTrue(holder.required, @"'%@' holder is not set to required", holder.name);
 }
 
