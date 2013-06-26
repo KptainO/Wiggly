@@ -13,14 +13,14 @@
 
 @interface WIRegex : NSObject
 
-@property(nonatomic, strong)WIRoute   *route;
-@property(nonatomic, strong)NSString  *regex;
+@property(nonatomic, strong)WIRoute               *route;
+@property(nonatomic, strong)NSRegularExpression   *pattern;
 
-@property(nonatomic, strong)NSString  *shortRegex;
-@property(nonatomic, strong)NSString  *longRegex;
+@property(nonatomic, strong)NSString              *path;
+@property(nonatomic, strong)NSString              *atomicPath;
 
-@property(nonatomic, strong)NSString      *segmentFormat;
-@property(nonatomic, strong)NSDictionary  *segments;
+@property(nonatomic, strong)NSString              *segmentFormat;
+@property(nonatomic, strong)NSMutableArray        *segments;
 
 - (id)initWithRoute:(WIRoute *)route format:(NSString *)segmentFormat;
 

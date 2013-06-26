@@ -11,19 +11,13 @@
 #import "WIRoute.h"
 #import "WIRouteParameter.h"
 #import "WIRegexSegment.h"
+#import "WIRegex.h"
 
 #define kWISeparatorSet       [NSCharacterSet characterSetWithCharactersInString:@"/-+_"]
 
 @interface WIRouteBuilder ()
 
-@property(nonatomic, strong)NSString        *regex;
-
-@property(nonatomic, strong)WIRoute         *route;
-@property(nonatomic, strong)NSString        *longPath_;
-@property(nonatomic, strong)NSString        *shortPath_;
-@property(nonatomic, strong)NSMutableArray  *segments_;
-
-- (void)_build;
+@property(nonatomic, strong)WIRoute         *route_;
 
 @end
 
@@ -32,91 +26,13 @@
 #pragma mark -
 #pragma mark Initialization
 
-- (id)initWithRoute:(WIRoute *)route {
+- (id)init {
   if (!(self = [super init]))
     return nil;
 
   self.markerDelegate = self;
 
-  self.route = route;
-
   return self;
-}
-
-- (id)init {
-  @throw [NSException exceptionWithName:@"Invalid Ctor" reason:nil userInfo:nil];
-  return nil;
-}
-
-- (NSString *)generate:(NSDictionary *)values {
-  NSMutableString *path = [[NSMutableString alloc] init];
-  NSUInteger previousMarkerIdx = 0;
-  NSMutableDictionary *allValues = nil;
-  BOOL shortVersion = [self _shouldGenerateShortPathWithValues:values];
-
-  path.string = shortVersion ? self.shortPath_ : self.longPath_;
-
-  // Merge default values with those provided by user
-  allValues = [NSMutableDictionary dictionaryWithCapacity:self.segments.count];
-
-  for (WIRegexSegment *segment in self.segments)
-    if (!shortVersion || segment.required)
-      allValues[segment.name] = values[segment.name]
-      ? [values[segment.name] description]
-      : [segment.defaults description];
-
-  if (self.delegate)
-    allValues.dictionary = [self.delegate builder:self willUseValues:allValues];
-
-  // replace segments with their associated variable value
-  for (WIRegexSegment *segment in self.segments)
-  {
-    NSString *marker = [self.markerDelegate builder:self markerForPlaceholder:segment];
-    NSRange markerRange = [path rangeOfString:marker options:0 range:NSMakeRange(previousMarkerIdx, path.length - previousMarkerIdx)];
-
-    if (markerRange.location == NSNotFound)
-      continue;
-
-    // variable does not fulfill segment conditions
-    if (![segment matchConditions:allValues[segment.name]])
-      @throw [NSException exceptionWithName:@"" reason:@"" userInfo:nil];
-
-    [path replaceOccurrencesOfString:marker
-                          withString:allValues[segment.name]
-                             options:0
-                               range:markerRange];
-
-    // Optimization: search next segment after the one we've just replaced
-    previousMarkerIdx = markerRange.location;
-  }
-
-  return path;
-}
-
-- (NSDictionary *)match:(NSString *)pattern {
-  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.regex options:0 error:nil];
-  NSTextCheckingResult *matches = [regex firstMatchInString:pattern options:0 range:NSMakeRange(0, pattern.length)];
-  NSMutableDictionary *values = [NSMutableDictionary dictionary];
-  NSMutableDictionary *allValues = nil;
-  
-  if (!matches)
-    return nil;
-
-  for (WIRegexSegment *segment in self.segments) {
-    NSUInteger matchingRangeIdx = segment.order + 1 + (segment.required ? 0 : 1);
-    NSRange valueRange = [matches rangeAtIndex:matchingRangeIdx];
-    
-    if (valueRange.location != NSNotFound)
-      values[segment.name] = [pattern substringWithRange:valueRange];
-  }
-
-  if (self.delegate)
-    values.dictionary = [self.delegate builder:self didReceivedValues:values];
-
-  allValues = [NSMutableDictionary dictionaryWithDictionary:self.route.defaults];
-  [allValues addEntriesFromDictionary:values];
-  
-  return allValues;
 }
 
 #pragma mark -
@@ -133,41 +49,41 @@
 }
 
 #pragma mark -
-#pragma WIRoute proxy methods
-
-- (NSString *)path {
-  return self.longPath_;
-}
-
-- (NSString *)longPath_ {
-  return self.route.path;
-}
-
-#pragma mark -
 #pragma mark Protected Methods
 
-- (void)_build {
-  NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route.path.length];
+- (WIRegex *)build:(WIRoute *)route {
+  WIRegex *regex;
+  
+  self.route_ = route;
+  regex = [self _build];
+  self.route_ = nil;
+  
+  return regex;
+}
+
+- (WIRegex *)_build {
+  WIRegex *regex = [[WIRegex alloc] initWithRoute:self.route_ format:@":%@"];
+  NSMutableString *pattern = [NSMutableString stringWithCapacity:self.route_.path.length];
   NSUInteger prevStrIdx = 0;
   NSDictionary *optSegment = nil;
-  NSString *marker = [NSString stringWithFormat:@"(%@)", [self.markerDelegate builderMarkerRegex:self]];
-  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:marker
+  NSString *segmentPattern = [NSString stringWithFormat:@"(%@)", [self.markerDelegate builderMarkerRegex:self]];
+  NSRegularExpression *segmentsRegex = [NSRegularExpression regularExpressionWithPattern:segmentPattern
                                                                          options:NSRegularExpressionCaseInsensitive
                                                                            error:nil];
-  NSArray *segments = [regex matchesInString:self.route.path
+  NSArray *segments = [segmentsRegex matchesInString:self.route_.path
                                          options:NSMatchingReportCompletion
-                                           range:NSMakeRange(0, self.route.path.length)];
+                                           range:NSMakeRange(0, self.route_.path.length)];
 
 
   for (NSTextCheckingResult *segmentMatch in segments)
   {
     NSRange matchRange = [segmentMatch range];
     NSRange segmentRange = [segmentMatch rangeAtIndex:2];
-    NSString *variableName = [self.route.path substringWithRange:segmentRange];
-    NSString *prevStr = [self.route.path substringWithRange:
+    NSString *variableName = [self.route_.path substringWithRange:segmentRange];
+    NSString *prevStr = [self.route_.path substringWithRange:
                                       NSMakeRange(prevStrIdx, matchRange.location - prevStrIdx)];
 
-    WIRegexSegment *segment = [self _addSegment:variableName];
+    WIRegexSegment *segment = [self _addSegment:variableName regex:regex];
 
     [pattern appendString:prevStr];
 
@@ -179,11 +95,11 @@
     // Try to determine if first optional segment
     // Optional part is obviously at the current end of building patten
     // and at segment position inside path
-    if (self.route.defaults[variableName] && !optSegment)
+    if (self.route_.defaults[variableName] && !optSegment)
       optSegment = @{
         @"regexIdx": @(pattern.length),
         @"pathIdx": @([segmentMatch rangeAtIndex:1].location),
-        @"segmentIdx": @(self.segments.count - 1)
+        @"segmentIdx": @(regex.segments.count - 1)
       };
 
     [pattern appendString:[NSString stringWithFormat:@"(%@)", segment.conditions]];
@@ -193,9 +109,9 @@
 
   // Append any missing part from path (after the last found segment)
   // which also means that there is no segment which can be optional
-  if (prevStrIdx <= (self.route.path.length - 1))
+  if (prevStrIdx <= (self.route_.path.length - 1))
   {
-    [pattern appendString:[self.route.path substringFromIndex:prevStrIdx]];
+    [pattern appendString:[self.route_.path substringFromIndex:prevStrIdx]];
 
     optSegment = nil;
   }
@@ -217,72 +133,43 @@
       pathOptSegIdx -= 1;
     }
 
-    // Generate paths
-    self.shortPath_ = [self.longPath_ substringToIndex:pathOptSegIdx];
-
     // Update pattern
     [pattern insertString:@"(" atIndex:regexOptSegIdx];
     [pattern appendString:@")?"];
 
     // Set every segment which is in the optional segment as optional
     // and update its metadata
-    for (int i = [optSegment[@"segmentIdx"] intValue]; i < self.segments.count; ++i)
+    for (int i = [optSegment[@"segmentIdx"] intValue]; i < regex.segments.count; ++i)
     {
-      WIRegexSegment *segment = self.segments[i];
+      WIRegexSegment *segment = regex.segments[i];
 
       [segment setRequired:NO];
     }
+    
+    // Generate paths
+    regex.atomicPath = [self.route_.path substringToIndex:pathOptSegIdx];
   }
+  else
+    regex.atomicPath = self.route_.path;
+  
+  regex.path = self.route_.path;
+  regex.pattern = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                          options:0
+                                                            error:nil];
 
-  self.regex = [NSString stringWithString:pattern];
+  return regex;
 }
 
-- (WIRegexSegment *)_addSegment:(NSString *)name {
+- (WIRegexSegment *)_addSegment:(NSString *)name regex:(WIRegex *)regex {
   WIRegexSegment  *segment = [[WIRegexSegment alloc] initWithName:name];
 
-  segment.defaults = self.route.defaults[name];
-  segment.conditions = self.route.requirements[name];
-  segment.order = self.segments_.count;
+  segment.defaults = self.route_.defaults[name];
+  segment.conditions = self.route_.requirements[name];
+  segment.order = regex.segments.count;
   
-  [self.segments_ addObject:segment];
+  [regex.segments addObject:segment];
 
   return segment;
-}
-
-- (BOOL)_shouldGenerateShortPathWithValues:(NSDictionary *)values {
-  BOOL useShortPath = YES;
-
-  if (!self.shortPath_)
-    return NO;
-
-  for (WIRegexSegment *segment in self.segments)
-  {
-    NSString *value = [values[segment.name] description];
-
-    if (!segment.required && value && ![value isEqualToString:[segment.defaults description]])
-    {
-      useShortPath = NO;
-      break;
-    }
-  }
-
-  return useShortPath;
-}
-
-- (void)setRoute:(WIRoute *)route {
-  if (route != _route)
-  {
-    _route = route;
-
-    self.segments_ = [NSMutableArray array];
-    self.shortPath_ = nil;
-    
-    [self _build];
-  }
-}
-
-- (NSArray *)segments {
-  return self.segments_;
 }
 
 @end

@@ -24,6 +24,7 @@
   
   self.route = route;
   self.segmentFormat = segmentFormat;
+  self.segments = [NSMutableArray array];
   
   return self;
 }
@@ -34,15 +35,14 @@
   NSMutableDictionary *allValues = nil;
   BOOL shortVersion = [self _shouldGenerateShortPathWithValues:values];
   
-  path.string = shortVersion ? self.shortRegex : self.longRegex;
+  path.string = shortVersion ? self.atomicPath : self.path;
   
   // Merge default values with those provided by user
   allValues = [NSMutableDictionary dictionaryWithCapacity:self.segments.count];
    
   // replace segments with their associated variable value
-  for (NSString *key in self.segments)
+  for (WIRegexSegment *segment in self.segments)
   {
-    WIRegexSegment *segment = self.segments[key];
     NSString *marker = [NSString stringWithFormat:self.segmentFormat, segment.name];
     NSRange markerRange = [path rangeOfString:marker options:0 range:NSMakeRange(previousMarkerIdx, path.length - previousMarkerIdx)];
     
@@ -66,8 +66,7 @@
 }
 
 - (NSDictionary *)match:(NSString *)pattern {
-  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.regex options:0 error:nil];
-  NSTextCheckingResult *matches = [regex firstMatchInString:pattern options:0 range:NSMakeRange(0, pattern.length)];
+  NSTextCheckingResult *matches = [self.pattern firstMatchInString:pattern options:0 range:NSMakeRange(0, pattern.length)];
   NSMutableDictionary *values = [NSMutableDictionary dictionary];
   NSMutableDictionary *allValues = nil;
   
@@ -94,7 +93,7 @@
 - (BOOL)_shouldGenerateShortPathWithValues:(NSDictionary *)values {
   BOOL useShortPath = YES;
   
-  if (!self.shortRegex)
+  if (!self.atomicPath)
     return NO;
   
   for (WIRegexSegment *segment in self.segments)
