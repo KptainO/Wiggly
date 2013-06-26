@@ -10,29 +10,28 @@
 
 #import "WIRoute.h"
 #import "WIRouteBuilder.h"
+#import "WIRegex.h"
 
 @interface WIRouter ()
-@property(nonatomic, strong)WIRouteBuilder  *builder_;
-@property(nonatomic, assign)Class           builderClass_;
+@property(nonatomic, weak)WIRegex *regex_;
 @end
 
 @implementation WIRouter
 
-@synthesize builder_ = builder_;
+@synthesize regex_ = _regex;
 
 #pragma mark -
 #pragma mark Initialization
 
-- (id)initWithRoute:(WIRoute *)route {
-  return [self initWithRoute:route builder:[WIRouteBuilder class]];
+- (id)init {
+  CtorNotInherited
 }
 
-- (id)initWithRoute:(WIRoute *)route builder:(__unsafe_unretained Class)builder {
+- (id)initWithRoute:(WIRoute *)route {
   if (!(self = [super init]))
     return nil;
 
   self.route = route;
-  self.builderClass_ = builder;
 
   return self;
 }
@@ -45,23 +44,30 @@
 
   if (values && ![values isKindOfClass:[NSDictionary class]])
   {
-    NSString *msg = [NSString stringWithFormat:@"Route %@ can't route an object ", self.builder_.path];
+    NSString *msg = [NSString stringWithFormat:@"Route can't route an object "];
     @throw [NSException exceptionWithName:@"Invalid argument" reason:msg userInfo:nil];
 
   }
-
-  return [self.builder_ generate:values];
+  
+  return [self.regex_ generate:values];
 }
 
 - (id)match:(NSString *)route {
-  return [self.builder_ match:route];
+  return [self.regex_ match:route];
 }
 
-- (WIRouteBuilder *)builder_ {
-  if (!builder_)
-    self.builder_ = [[self.builderClass_ alloc] initWithRoute:self.route];
+- (WIRegex *)regex_ {
+  if (!_regex)
+    _regex = [self.builder build:self.route];
+  
+  return _regex;
+}
 
-  return builder_;
+- (WIRouteBuilder *)builder {
+  if (!_builder)
+    _builder = [[WIRouteBuilder alloc] init];
+  
+  return _builder;
 }
 
 @end

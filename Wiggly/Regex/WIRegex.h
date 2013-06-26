@@ -25,5 +25,6 @@
 - (id)initWithRoute:(WIRoute *)route format:(NSString *)segmentFormat;
 
 - (NSString *)generate:(NSDictionary *)values;
+- (NSDictionary *)match:(NSString *)pattern;
 
 @end
