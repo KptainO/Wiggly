@@ -48,11 +48,11 @@
     
     // Segment has no value (no default and no one passed as argument)
     if (!value)
-      @throw [NSException exceptionWithName:@"" reason:@"" userInfo:nil];
+      @throw [NSException exceptionWithName:NSInvalidArgumentException reason:nil userInfo:nil];
     
     // variable does not fulfill segment conditions
     if (![segment matchConditions:value])
-      @throw [NSException exceptionWithName:@"" reason:@"" userInfo:nil];
+      @throw [NSException exceptionWithName:NSInvalidArgumentException reason:nil userInfo:nil];
     
     [path replaceOccurrencesOfString:marker
                           withString:value
