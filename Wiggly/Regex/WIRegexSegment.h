@@ -13,7 +13,6 @@
 @interface WIRegexSegment : WIRouteParameter
 
 @property(nonatomic, assign)BOOL          required;
-@property(nonatomic, assign)NSUInteger    order;
 //@property(nonatomic, strong)WIRouteParameter  *parameter;
 
 @end

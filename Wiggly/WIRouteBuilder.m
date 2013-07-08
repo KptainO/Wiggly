@@ -165,7 +165,6 @@
 
   segment.defaults = self.route_.defaults[name];
   segment.conditions = self.route_.requirements[name];
-  segment.order = regex.segments.count;
   
   [regex.segments addObject:segment];
 

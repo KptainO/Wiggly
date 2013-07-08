@@ -32,29 +32,30 @@
 - (NSString *)generate:(NSDictionary *)values {
   NSMutableString *path = [[NSMutableString alloc] init];
   NSUInteger previousMarkerIdx = 0;
-  NSMutableDictionary *allValues = nil;
   BOOL shortVersion = [self _shouldGenerateShortPathWithValues:values];
   
   path.string = shortVersion ? self.atomicPath : self.path;
-  
-  // Merge default values with those provided by user
-  allValues = [NSMutableDictionary dictionaryWithCapacity:self.segments.count];
-   
+    
   // replace segments with their associated variable value
   for (WIRegexSegment *segment in self.segments)
   {
     NSString *marker = [NSString stringWithFormat:self.segmentFormat, segment.name];
     NSRange markerRange = [path rangeOfString:marker options:0 range:NSMakeRange(previousMarkerIdx, path.length - previousMarkerIdx)];
+    NSString *value = [values[segment.name] description] ?: [segment.defaults description];
     
     if (markerRange.location == NSNotFound)
       continue;
     
+    // Segment has no value (no default and no one passed as argument)
+    if (!value)
+      @throw [NSException exceptionWithName:@"" reason:@"" userInfo:nil];
+    
     // variable does not fulfill segment conditions
-    if (![segment matchConditions:allValues[segment.name]])
+    if (![segment matchConditions:value])
       @throw [NSException exceptionWithName:@"" reason:@"" userInfo:nil];
     
     [path replaceOccurrencesOfString:marker
-                          withString:values[segment.name] ?: segment.defaults
+                          withString:value
                              options:0
                                range:markerRange];
     
@@ -68,27 +69,32 @@
 - (NSDictionary *)match:(NSString *)pattern {
   NSTextCheckingResult *matches = [self.pattern firstMatchInString:pattern options:0 range:NSMakeRange(0, pattern.length)];
   NSMutableDictionary *values = [NSMutableDictionary dictionary];
-  NSMutableDictionary *allValues = nil;
+  int i = 0;
   
   if (!matches)
     return nil;
   
   for (WIRegexSegment *segment in self.segments) {
-    NSUInteger matchingRangeIdx = segment.order + 1 + (segment.required ? 0 : 1);
+    NSUInteger matchingRangeIdx = ++i + (segment.required ? 0 : 1);
     NSRange valueRange = [matches rangeAtIndex:matchingRangeIdx];
     
     if (valueRange.location != NSNotFound)
       values[segment.name] = [pattern substringWithRange:valueRange];
+    else
+      values[segment.name] = [segment.defaults description];
   }
-  
-//  if (self.delegate)
-//    values.dictionary = [self.delegate builder:self didReceivedValues:values];
-  
-  allValues = [NSMutableDictionary dictionaryWithDictionary:self.route.defaults];
-  [allValues addEntriesFromDictionary:values];
-  
-  return allValues;
+   
+  return values;
 }
+
+- (void)setStringPattern:(NSString *)pattern {
+  self.pattern = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                           options:0
+                                                             error:nil];
+}
+
+#pragma mark -
+#pragma mark Private methods
 
 - (BOOL)_shouldGenerateShortPathWithValues:(NSDictionary *)values {
   BOOL useShortPath = YES;

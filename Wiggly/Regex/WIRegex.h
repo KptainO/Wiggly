@@ -27,4 +27,6 @@
 - (NSString *)generate:(NSDictionary *)values;
 - (NSDictionary *)match:(NSString *)pattern;
 
+- (void)setStringPattern:(NSString *)pattern;
+
 @end
