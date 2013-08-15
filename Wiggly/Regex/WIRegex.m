@@ -29,6 +29,10 @@
   return self;
 }
 
+- (NSString *)generate {
+  return [self generate:nil];
+}
+
 - (NSString *)generate:(NSDictionary *)values {
   NSMutableString *path = [[NSMutableString alloc] init];
   NSUInteger previousMarkerIdx = 0;
